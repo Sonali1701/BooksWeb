@@ -12,6 +12,7 @@
     "description": "Comprehensive reference biology text, opened chapter-wise in the reader.",
     "sourceUrl": "",
     "pdf": "pdfs/Campbell Biology, Tenth Edition - Reece, Urry, Cain et al (1).pdf",
+    "localOnly": true,
     "chapters": [
       {
         "title": "Chapter 1: Evolution, the Themes of Biology, and Scientific Inquiry",

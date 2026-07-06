@@ -28,6 +28,9 @@ let selectedBook = null;
 let selectedChapterIndex = null; // null = complete book / single PDF
 let currentPdfPath = null;
 
+// Books flagged localOnly (large local demo files) only render when running locally.
+const IS_LOCAL = ["localhost", "127.0.0.1", ""].includes(location.hostname);
+
 const bookGrid = document.querySelector("#bookGrid");
 const searchInput = document.querySelector("#searchInput");
 const dataNotice = document.querySelector("#dataNotice");
@@ -293,6 +296,26 @@ function showPdf(pdfPath, page) {
   }
 }
 
+// A local-only book's PDF is only reachable when the site runs on your machine.
+function bookPdfAvailable(book) {
+  if (!book.pdf) return false;
+  if (book.localOnly && !IS_LOCAL) return false;
+  return true;
+}
+
+function showLocalOnly(book) {
+  currentPdfPath = null;
+  const sourceButton = book.sourceUrl
+    ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open original source</a>`
+    : "";
+  pdfFrame.innerHTML = `
+    <div class="pdf-placeholder">
+      <strong>Local-only sample</strong>
+      <p><em>${escapeHtml(book.title)}</em> is a large demo file that is not hosted online. Run this project on your computer (<code>py -m http.server</code>) to read it here, or host each chapter as a small PDF for the live site.</p>
+      ${sourceButton}
+    </div>`;
+}
+
 // Convert a Google Drive "file" link into an inline-embeddable preview URL.
 function driveEmbedUrl(url) {
   const match = String(url || "").match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
@@ -347,8 +370,10 @@ function renderReaderView() {
 
     if (chapter.pdf) {
       showPdf(chapter.pdf, chapter.page);
-    } else if (book.pdf) {
+    } else if (bookPdfAvailable(book)) {
       showPdf(book.pdf, chapter.page);
+    } else if (book.localOnly) {
+      showLocalOnly(book);
     } else {
       showEmbed(book);
     }
@@ -357,9 +382,12 @@ function renderReaderView() {
 
   // complete book / no chapters
   readerFileTitle.textContent = book.title;
-  if (book.pdf) {
+  if (bookPdfAvailable(book)) {
     readerFileStatus.textContent = hasChapters ? "Complete book" : book.pdf;
     showPdf(book.pdf, null);
+  } else if (book.localOnly) {
+    readerFileStatus.textContent = "Local-only sample";
+    showLocalOnly(book);
   } else if (driveEmbedUrl(book.sourceUrl)) {
     readerFileStatus.textContent = "Displayed from Google Drive";
     showEmbed(book);
@@ -503,8 +531,12 @@ async function init() {
     selectedBook = initial.book;
     selectedChapterIndex = initial.index;
   } else {
-    selectedBook = books[0] || null;
-    selectedChapterIndex = selectedBook && selectedBook.chapters && selectedBook.chapters.length ? 0 : null;
+    // Land on the first book that will actually render in this environment
+    // (a reachable local PDF, or an embeddable Drive file), else just the first book.
+    selectedBook =
+      books.find((b) => bookPdfAvailable(b) || driveEmbedUrl(b.sourceUrl)) || books[0] || null;
+    selectedChapterIndex =
+      selectedBook && selectedBook.chapters && selectedBook.chapters.length ? 0 : null;
   }
 
   setupFilters();
