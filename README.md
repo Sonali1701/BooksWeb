@@ -41,10 +41,45 @@ JSON array; each entry has:
 | `description` | `H. C. Verma \| Bharti Bhavan`            | Short summary shown on the card (optional)     |
 | `sourceUrl`   | `https://drive.google.com/...`            | Original Google Drive link to view/download    |
 | `pdf`         | `pdfs/physics-hc-verma-part1.pdf`         | Local PDF path (leave `""` until downloaded)   |
+| `chapters`    | `[ {title, page} ]`                       | Optional — enables the chapter-wise reader     |
 
 The five filters (Subject, Class, Wing, Language, Year) are generated automatically from
 whatever values appear in `books.json` — add a new subject or year and it shows up in the
 dropdowns without any code change.
+
+## Chapter-wise books (like NCERT)
+
+Give an entry a `chapters` array and the reader shows a scrollable **Contents** list with
+previous/next chapter navigation — the same experience as the NCERT textbook pages.
+
+Each chapter can open in one of two ways:
+
+```jsonc
+"chapters": [
+  // Mode A: page anchor into the book's single combined PDF (uses book.pdf)
+  { "title": "Chapter 1: Units and Measurements", "page": 49, "unit": "Unit 1" },
+
+  // Mode B: a separate PDF file per chapter (the NCERT model)
+  { "title": "Chapter 1: Units and Measurements", "pdf": "pdfs/physics-11/ch01.pdf" }
+]
+```
+
+- `page` jumps to that page of `book.pdf` via the browser's `#page=` viewer.
+- `pdf` opens a standalone file (leave `page` out).
+- `unit` (optional) groups chapters under a heading in the Contents list.
+
+The included **Campbell Biology (Tenth Edition)** entry is a live demo of Mode A — its 55
+chapters were read directly from the PDF's bookmarks.
+
+## Hosting large PDFs
+
+Browsers must download the whole file to open it, and **GitHub Pages rejects any file over
+100 MB**. The Campbell sample PDF is ~274 MB, so it works locally but cannot be hosted as-is.
+For production:
+
+- **Prefer Mode B** (one PDF per chapter) — each file is small, fast, and well under the limit.
+- Or keep large books on Google Drive and rely on `sourceUrl` (no hosting needed).
+- Only commit PDFs you have the right to distribute publicly.
 
 ## Adding the actual PDFs
 

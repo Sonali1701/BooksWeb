@@ -20,57 +20,28 @@
     </a>
 
     <nav class="topnav" aria-label="Primary navigation">
-      <a href="#catalog">Catalog</a>
+      <a href="#catalog">Filters</a>
       <a href="#reader">Reader</a>
-      <a href="#resources">Resources</a>
+      <a href="#books">Materials</a>
     </nav>
   </header>
 
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow">Books, planners, sheets, and folders in one calm access space</p>
-        <h1 id="hero-title">Digital materials library</h1>
-        <p>
-          Browse study materials by subject, class, wing, language, and year,
-          then open the source PDF in a clean built-in reader.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="#catalog">Browse books</a>
-          <a class="button secondary" href="#reader">Open reader</a>
-        </div>
-      </div>
-
-      <div class="hero-visual" aria-hidden="true">
-        <div class="book-stack">
-          <div class="hero-book cover-science"></div>
-          <div class="hero-book cover-math"></div>
-          <div class="hero-book cover-history"></div>
-        </div>
-        <div class="page-preview">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </section>
-
     <section id="catalog" class="catalog-section" aria-labelledby="catalog-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Catalog</p>
-          <h2 id="catalog-title">Find material</h2>
+          <h1 id="catalog-title">Digital Textbook Library</h1>
+          <p class="section-sub">Filter by subject, class, wing, language, and year — then read chapter-wise in the reader below.</p>
         </div>
         <label class="search-box">
           <span>Search</span>
-          <input id="searchInput" type="search" placeholder="Title, subject, wing..." autocomplete="off">
+          <input id="searchInput" type="search" placeholder="Title, subject, author..." autocomplete="off">
         </label>
       </div>
 
       <p id="dataNotice" class="data-notice" hidden></p>
 
-      <div class="filters" aria-label="Book filters">
+      <div class="filters" aria-label="Book filters" id="filters">
         <label>
           <span>Subject</span>
           <select id="subjectFilter"></select>
@@ -92,26 +63,38 @@
           <select id="yearFilter"></select>
         </label>
       </div>
-
-      <div id="bookGrid" class="book-grid" aria-live="polite"></div>
     </section>
 
     <section id="reader" class="reader-section" aria-labelledby="reader-title">
       <div class="reader-shell">
         <aside class="reader-sidebar" aria-label="Selected material details">
-          <p class="eyebrow">Selected Material</p>
+          <p class="eyebrow">Now reading</p>
           <h2 id="reader-title">Select a material</h2>
           <p id="readerMeta" class="reader-meta">Subject | Class | Wing | Language | Year</p>
           <dl id="readerFacts" class="reader-facts"></dl>
-          <a id="sourceLink" class="button primary reader-download" href="#" target="_blank" rel="noreferrer" hidden>Open original source</a>
-          <a id="downloadPdf" class="button secondary reader-download" href="#" target="_blank" rel="noreferrer" hidden>Open local PDF</a>
+          <div class="reader-actions">
+            <a id="sourceLink" class="button primary reader-download" href="#" target="_blank" rel="noreferrer" hidden>Open original source</a>
+            <button id="completeBook" class="button secondary reader-download" type="button" hidden>Read complete book</button>
+          </div>
+
+          <div id="contents" class="contents" hidden>
+            <p class="contents-title">Contents <span id="chapterCount" class="contents-count"></span></p>
+            <input id="chapterSearch" class="chapter-search" type="search" placeholder="Find a chapter..." autocomplete="off">
+            <div id="chapterList" class="chapter-list"></div>
+          </div>
         </aside>
 
         <article class="reader-panel">
           <div class="reader-toolbar">
-            <div>
+            <button id="prevChapter" class="icon-button" type="button" aria-label="Previous chapter" hidden>&lsaquo;</button>
+            <div class="reader-toolbar-title">
               <strong id="readerFileTitle">No material selected</strong>
-              <span id="readerFileStatus">Choose a material from the catalog above</span>
+              <span id="readerFileStatus">Pick a book from the list below</span>
+            </div>
+            <button id="nextChapter" class="icon-button" type="button" aria-label="Next chapter" hidden>&rsaquo;</button>
+            <div class="reader-tools">
+              <button id="toggleSidebar" class="tool-button" type="button" aria-pressed="false" title="Hide the details panel for a wider page">Hide panel</button>
+              <button id="fullscreenBtn" class="tool-button" type="button" title="Open the reader in fullscreen">&#9974; Fullscreen</button>
             </div>
           </div>
 
@@ -120,25 +103,14 @@
       </div>
     </section>
 
-    <section id="resources" class="resource-band" aria-labelledby="resource-title">
-      <div>
-        <p class="eyebrow">Platform Ready</p>
-        <h2 id="resource-title">Built for textbook publishing</h2>
+    <section id="books" class="list-section" aria-labelledby="list-title">
+      <div class="catalog-meta">
+        <h2 id="list-title" class="list-title">Materials</h2>
+        <span id="resultCount" class="result-count"></span>
+        <button id="clearFilters" class="text-button" type="button" hidden>Clear filters</button>
       </div>
-      <div class="resource-grid">
-        <div>
-          <strong>Structured catalog</strong>
-          <p>Every material is tagged by subject, class, wing, language, and year for fast filtering.</p>
-        </div>
-        <div>
-          <strong>Built-in PDF reader</strong>
-          <p>Downloaded source PDFs open inline with a one-click open and download option.</p>
-        </div>
-        <div>
-          <strong>Responsive layout</strong>
-          <p>The interface works on desktop, tablet, and mobile without a server.</p>
-        </div>
-      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite"></div>
     </section>
   </main>
 

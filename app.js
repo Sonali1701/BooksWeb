@@ -10,6 +10,7 @@ const fallbackBooks = [
     language: "English",
     year: "2024-25",
     description: "A built-in sample shown only if books.json cannot be loaded. Run the folder through a local server to load the full catalog.",
+    sourceUrl: "",
     pdf: ""
   }
 ];
@@ -24,16 +25,30 @@ const FILTERS = [
 
 let books = [];
 let selectedBook = null;
+let selectedChapterIndex = null; // null = complete book / single PDF
+let currentPdfPath = null;
 
 const bookGrid = document.querySelector("#bookGrid");
 const searchInput = document.querySelector("#searchInput");
 const dataNotice = document.querySelector("#dataNotice");
+const resultCount = document.querySelector("#resultCount");
+const clearFilters = document.querySelector("#clearFilters");
 
 const readerTitle = document.querySelector("#reader-title");
 const readerMeta = document.querySelector("#readerMeta");
 const readerFacts = document.querySelector("#readerFacts");
-const downloadPdf = document.querySelector("#downloadPdf");
 const sourceLink = document.querySelector("#sourceLink");
+const completeBook = document.querySelector("#completeBook");
+const contents = document.querySelector("#contents");
+const chapterCount = document.querySelector("#chapterCount");
+const chapterSearch = document.querySelector("#chapterSearch");
+const chapterList = document.querySelector("#chapterList");
+const prevChapter = document.querySelector("#prevChapter");
+const nextChapter = document.querySelector("#nextChapter");
+const toggleSidebar = document.querySelector("#toggleSidebar");
+const fullscreenBtn = document.querySelector("#fullscreenBtn");
+const readerShell = document.querySelector(".reader-shell");
+const readerPanel = document.querySelector(".reader-panel");
 const readerFileTitle = document.querySelector("#readerFileTitle");
 const readerFileStatus = document.querySelector("#readerFileStatus");
 const pdfFrame = document.querySelector("#pdfFrame");
@@ -50,6 +65,8 @@ const SUBJECT_COLORS = {
 function colorForSubject(subject) {
   return SUBJECT_COLORS[subject] || "linear-gradient(145deg, #5e6a70, #d6a54c)";
 }
+
+/* ---------- filters ---------- */
 
 function sortValues(key, values) {
   if (key === "class") {
@@ -74,25 +91,18 @@ function fillSelect(select, values) {
 }
 
 function setupFilters() {
-  FILTERS.forEach((filter) => {
-    fillSelect(filter.el, uniqueValues(filter.key));
-  });
+  FILTERS.forEach((filter) => fillSelect(filter.el, uniqueValues(filter.key)));
+}
+
+function filtersActive() {
+  return FILTERS.some((f) => f.active !== "All") || searchInput.value.trim() !== "";
 }
 
 function bookMatchesFilters(book, query) {
   const searchable = [
-    book.title,
-    book.subject,
-    book.class,
-    book.wing,
-    book.language,
-    book.year,
-    book.description,
-    book.author,
-    book.publication
-  ]
-    .join(" ")
-    .toLowerCase();
+    book.title, book.subject, book.class, book.wing,
+    book.language, book.year, book.description, book.author, book.publication
+  ].join(" ").toLowerCase();
 
   const passesFilters = FILTERS.every(
     (filter) => filter.active === "All" || book[filter.key] === filter.active
@@ -101,9 +111,14 @@ function bookMatchesFilters(book, query) {
   return passesFilters && searchable.includes(query);
 }
 
+/* ---------- catalog ---------- */
+
 function renderBooks() {
   const query = searchInput.value.trim().toLowerCase();
   const filteredBooks = books.filter((book) => bookMatchesFilters(book, query));
+
+  resultCount.textContent = `${filteredBooks.length} of ${books.length} materials`;
+  clearFilters.hidden = !filtersActive();
 
   bookGrid.innerHTML = "";
 
@@ -114,6 +129,10 @@ function renderBooks() {
   }
 
   filteredBooks.forEach((book) => {
+    const chapterBadge = book.chapters && book.chapters.length
+      ? `<span class="chapter-badge">${book.chapters.length} chapters</span>`
+      : "";
+
     const card = document.createElement("button");
     card.className = `book-card ${selectedBook && book.id === selectedBook.id ? "active" : ""}`;
     card.type = "button";
@@ -121,7 +140,7 @@ function renderBooks() {
       <span class="book-cover" style="background: ${escapeHtml(colorForSubject(book.subject))}">
         <span class="book-cover-subject">${escapeHtml(book.subject || "")}</span>
       </span>
-      <span>
+      <span class="book-body">
         <span class="book-format">${escapeHtml(book.wing || "Material")}${book.year ? " &middot; " + escapeHtml(book.year) : ""}</span>
         <h3>${escapeHtml(book.title)}</h3>
         <p>${escapeHtml(book.description || (book.publication ? book.publication : "Source available — open to view or download."))}</p>
@@ -130,6 +149,7 @@ function renderBooks() {
           <span class="tag">Class ${escapeHtml(book.class)}</span>
           <span class="tag">${escapeHtml(book.wing)}</span>
           <span class="tag">${escapeHtml(book.language)}</span>
+          ${chapterBadge}
         </span>
       </span>
     `;
@@ -138,8 +158,12 @@ function renderBooks() {
   });
 }
 
+/* ---------- reader ---------- */
+
 function selectBook(book) {
   selectedBook = book;
+  selectedChapterIndex = book.chapters && book.chapters.length ? 0 : null;
+  currentPdfPath = null;
   renderBooks();
   renderReader();
   document.querySelector("#reader").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -157,42 +181,200 @@ function renderFacts(book) {
   ].filter(([, value]) => value);
 
   readerFacts.innerHTML = facts
-    .map(
-      ([label, value]) => `
-      <div>
-        <dt>${escapeHtml(label)}</dt>
-        <dd>${escapeHtml(value || "-")}</dd>
-      </div>`
-    )
+    .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
     .join("");
 }
 
-function renderPdf(book) {
-  if (!book.pdf) {
-    const sourceButton = book.sourceUrl
-      ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open original source</a>`
-      : "";
-    pdfFrame.innerHTML = `
-      <div class="pdf-placeholder">
-        <strong>PDF not added locally yet</strong>
-        <p>Download <em>${escapeHtml(book.title)}</em> from its original source, save it in the <code>pdfs/</code> folder, then set the <code>pdf</code> path for this entry in <code>books.json</code> to show it inline here.</p>
-        ${sourceButton}
-      </div>`;
+function renderChapterList(book) {
+  const hasChapters = book.chapters && book.chapters.length;
+  contents.hidden = !hasChapters;
+  prevChapter.hidden = !hasChapters;
+  nextChapter.hidden = !hasChapters;
+
+  if (!hasChapters) {
+    chapterList.innerHTML = "";
     return;
   }
 
+  chapterSearch.value = "";
+  chapterCount.textContent = `(${book.chapters.length})`;
+
+  let html = "";
+  let lastUnit = null;
+  book.chapters.forEach((chapter, index) => {
+    if (chapter.unit && chapter.unit !== lastUnit) {
+      html += `<p class="unit-heading">${escapeHtml(chapter.unit)}</p>`;
+      lastUnit = chapter.unit;
+    }
+    html += `
+      <button class="chapter-button ${index === selectedChapterIndex ? "active" : ""}" type="button" data-index="${index}">
+        ${escapeHtml(chapter.title)}
+      </button>`;
+  });
+  chapterList.innerHTML = html;
+
+  chapterList.querySelectorAll(".chapter-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedChapterIndex = Number(button.dataset.index);
+      renderReaderView();
+    });
+  });
+}
+
+function filterChapters(query) {
+  const q = query.trim().toLowerCase();
+  chapterList.querySelectorAll(".chapter-button").forEach((button) => {
+    button.style.display = button.textContent.toLowerCase().includes(q) ? "" : "none";
+  });
+  chapterList.querySelectorAll(".unit-heading").forEach((heading) => {
+    let el = heading.nextElementSibling;
+    let anyVisible = false;
+    while (el && !el.classList.contains("unit-heading")) {
+      if (el.classList.contains("chapter-button") && el.style.display !== "none") {
+        anyVisible = true;
+        break;
+      }
+      el = el.nextElementSibling;
+    }
+    heading.style.display = anyVisible ? "" : "none";
+  });
+}
+
+function persistSelection() {
+  if (!selectedBook) return;
+  const chPart = selectedChapterIndex !== null ? `&ch=${selectedChapterIndex}` : "&ch=all";
+  try {
+    localStorage.setItem("obl:last", JSON.stringify({ id: selectedBook.id, ch: selectedChapterIndex }));
+  } catch (e) { /* storage unavailable */ }
+  try {
+    history.replaceState(null, "", `#book=${encodeURIComponent(selectedBook.id)}${chPart}`);
+  } catch (e) { /* history unavailable */ }
+}
+
+function readInitialSelection() {
+  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  let id = params.get("book");
+  let ch = params.get("ch");
+  if (!id) {
+    try {
+      const saved = JSON.parse(localStorage.getItem("obl:last") || "null");
+      if (saved && saved.id) {
+        id = saved.id;
+        ch = saved.ch === null ? "all" : String(saved.ch);
+      }
+    } catch (e) { /* ignore */ }
+  }
+  if (!id) return null;
+  const book = books.find((b) => b.id === id);
+  if (!book) return null;
+
+  let index = null;
+  if (book.chapters && book.chapters.length) {
+    if (ch === "all") {
+      index = null;
+    } else {
+      const n = Number(ch);
+      index = Number.isInteger(n) && n >= 0 && n < book.chapters.length ? n : 0;
+    }
+  }
+  return { book, index };
+}
+
+function showPdf(pdfPath, page) {
+  const hash = page ? `#page=${page}` : "#view=FitH";
+  const src = encodeURI(pdfPath) + hash;
+  let iframe = pdfFrame.querySelector("iframe.pdf-embed");
+
+  if (!iframe || currentPdfPath !== pdfPath) {
+    pdfFrame.innerHTML = `<iframe class="pdf-embed" src="${escapeHtml(src)}" title="${escapeHtml(selectedBook.title)}"></iframe>`;
+    currentPdfPath = pdfPath;
+  } else {
+    iframe.src = src;
+  }
+}
+
+// Convert a Google Drive "file" link into an inline-embeddable preview URL.
+function driveEmbedUrl(url) {
+  const match = String(url || "").match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
+  return match ? `https://drive.google.com/file/d/${match[1]}/preview` : null;
+}
+
+// Show an embeddable source (currently Google Drive preview) inline in the reader.
+function showEmbed(book) {
+  const embed = driveEmbedUrl(book.sourceUrl);
+  if (!embed) {
+    showNoPdf(book);
+    return false;
+  }
+  currentPdfPath = "embed:" + embed;
   pdfFrame.innerHTML = `
-    <iframe class="pdf-embed" src="${escapeHtml(book.pdf)}#view=FitH" title="${escapeHtml(book.title)} PDF" loading="lazy"></iframe>
-    <p class="pdf-hint">If the document does not appear, the file <code>${escapeHtml(book.pdf)}</code> has not been added yet. Place the downloaded PDF in the <code>pdfs/</code> folder using that exact name.</p>
-  `;
+    <iframe class="pdf-embed" src="${escapeHtml(embed)}" title="${escapeHtml(book.title)}" allow="autoplay" allowfullscreen></iframe>
+    <p class="pdf-hint">Displayed from Google Drive. <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.</p>`;
+  return true;
+}
+
+function showNoPdf(book) {
+  currentPdfPath = null;
+  const sourceButton = book.sourceUrl
+    ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open original source</a>`
+    : "";
+  pdfFrame.innerHTML = `
+    <div class="pdf-placeholder">
+      <strong>PDF not added locally yet</strong>
+      <p>Download <em>${escapeHtml(book.title)}</em> from its original source, save it in the <code>pdfs/</code> folder, then set the <code>pdf</code> path for this entry in <code>books.json</code> to show it inline here.</p>
+      ${sourceButton}
+    </div>`;
+}
+
+function renderReaderView() {
+  const book = selectedBook;
+  const hasChapters = book.chapters && book.chapters.length;
+  persistSelection();
+
+  // highlight active chapter
+  if (hasChapters) {
+    chapterList.querySelectorAll(".chapter-button").forEach((button) => {
+      button.classList.toggle("active", Number(button.dataset.index) === selectedChapterIndex);
+    });
+  }
+
+  if (hasChapters && selectedChapterIndex !== null) {
+    const chapter = book.chapters[selectedChapterIndex];
+    readerFileTitle.textContent = chapter.title;
+    readerFileStatus.textContent = `Chapter ${selectedChapterIndex + 1} of ${book.chapters.length}`;
+    prevChapter.disabled = selectedChapterIndex === 0;
+    nextChapter.disabled = selectedChapterIndex === book.chapters.length - 1;
+
+    if (chapter.pdf) {
+      showPdf(chapter.pdf, chapter.page);
+    } else if (book.pdf) {
+      showPdf(book.pdf, chapter.page);
+    } else {
+      showEmbed(book);
+    }
+    return;
+  }
+
+  // complete book / no chapters
+  readerFileTitle.textContent = book.title;
+  if (book.pdf) {
+    readerFileStatus.textContent = hasChapters ? "Complete book" : book.pdf;
+    showPdf(book.pdf, null);
+  } else if (driveEmbedUrl(book.sourceUrl)) {
+    readerFileStatus.textContent = "Displayed from Google Drive";
+    showEmbed(book);
+  } else {
+    readerFileStatus.textContent = book.sourceUrl
+      ? "Open original source to view or download"
+      : "No PDF linked yet";
+    showNoPdf(book);
+  }
 }
 
 function renderReader() {
-  if (!selectedBook) {
-    return;
-  }
-
+  if (!selectedBook) return;
   const book = selectedBook;
+
   readerTitle.textContent = book.title;
   readerMeta.textContent = [book.subject, `Class ${book.class}`, book.wing, book.language, book.year]
     .filter(Boolean)
@@ -200,31 +382,16 @@ function renderReader() {
 
   renderFacts(book);
 
-  if (book.pdf) {
-    downloadPdf.hidden = false;
-    downloadPdf.href = book.pdf;
-  } else {
-    downloadPdf.hidden = true;
-    downloadPdf.removeAttribute("href");
-  }
+  sourceLink.hidden = !book.sourceUrl;
+  if (book.sourceUrl) sourceLink.href = book.sourceUrl;
 
-  if (book.sourceUrl) {
-    sourceLink.hidden = false;
-    sourceLink.href = book.sourceUrl;
-  } else {
-    sourceLink.hidden = true;
-    sourceLink.removeAttribute("href");
-  }
+  completeBook.hidden = !(book.pdf && book.chapters && book.chapters.length);
 
-  readerFileTitle.textContent = book.title;
-  readerFileStatus.textContent = book.pdf
-    ? book.pdf
-    : book.sourceUrl
-    ? "Open original source to view or download, then add the PDF locally"
-    : "No PDF linked yet";
-
-  renderPdf(book);
+  renderChapterList(book);
+  renderReaderView();
 }
+
+/* ---------- events ---------- */
 
 function bindEvents() {
   FILTERS.forEach((filter) => {
@@ -235,14 +402,76 @@ function bindEvents() {
   });
 
   searchInput.addEventListener("input", renderBooks);
+
+  clearFilters.addEventListener("click", () => {
+    FILTERS.forEach((filter) => {
+      filter.active = "All";
+      filter.el.value = "All";
+    });
+    searchInput.value = "";
+    renderBooks();
+  });
+
+  completeBook.addEventListener("click", () => {
+    selectedChapterIndex = null;
+    renderReaderView();
+  });
+
+  toggleSidebar.addEventListener("click", () => {
+    const collapsed = readerShell.classList.toggle("collapsed");
+    toggleSidebar.textContent = collapsed ? "Show panel" : "Hide panel";
+    toggleSidebar.setAttribute("aria-pressed", String(collapsed));
+  });
+
+  fullscreenBtn.addEventListener("click", () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (readerPanel.requestFullscreen) {
+      readerPanel.requestFullscreen();
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    const on = Boolean(document.fullscreenElement);
+    fullscreenBtn.innerHTML = on ? "&#10005; Exit fullscreen" : "&#9974; Fullscreen";
+  });
+
+  chapterSearch.addEventListener("input", () => filterChapters(chapterSearch.value));
+
+  document.addEventListener("keydown", (event) => {
+    const tag = document.activeElement ? document.activeElement.tagName : "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (!selectedBook || !(selectedBook.chapters && selectedBook.chapters.length)) return;
+
+    if (event.key === "ArrowLeft" && !prevChapter.disabled) {
+      event.preventDefault();
+      prevChapter.click();
+    } else if (event.key === "ArrowRight" && !nextChapter.disabled) {
+      event.preventDefault();
+      nextChapter.click();
+    }
+  });
+
+  prevChapter.addEventListener("click", () => {
+    if (selectedChapterIndex === null) selectedChapterIndex = 0;
+    selectedChapterIndex = Math.max(0, selectedChapterIndex - 1);
+    renderReaderView();
+  });
+
+  nextChapter.addEventListener("click", () => {
+    const total = selectedBook.chapters.length;
+    if (selectedChapterIndex === null) selectedChapterIndex = 0;
+    selectedChapterIndex = Math.min(total - 1, selectedChapterIndex + 1);
+    renderReaderView();
+  });
 }
+
+/* ---------- data ---------- */
 
 async function loadBooks() {
   try {
     const response = await fetch(CATALOG_URL, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`books.json returned ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`books.json returned ${response.status}`);
     books = await response.json();
     dataNotice.hidden = true;
   } catch (error) {
@@ -268,7 +497,16 @@ async function init() {
   });
 
   await loadBooks();
-  selectedBook = books[0] || null;
+
+  const initial = readInitialSelection();
+  if (initial) {
+    selectedBook = initial.book;
+    selectedChapterIndex = initial.index;
+  } else {
+    selectedBook = books[0] || null;
+    selectedChapterIndex = selectedBook && selectedBook.chapters && selectedBook.chapters.length ? 0 : null;
+  }
+
   setupFilters();
   bindEvents();
   renderBooks();
