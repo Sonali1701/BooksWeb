@@ -303,6 +303,14 @@ function bookPdfAvailable(book) {
   return true;
 }
 
+// Will this book display something inline in the reader (vs. just a source link)?
+function rendersInline(book) {
+  if (bookPdfAvailable(book)) return true;
+  if (driveEmbedUrl(book.sourceUrl)) return true;
+  if (book.chapters && book.chapters.some((c) => c.pdf)) return true;
+  return false;
+}
+
 function showLocalOnly(book) {
   currentPdfPath = null;
   const sourceButton = book.sourceUrl
@@ -533,8 +541,7 @@ async function init() {
   } else {
     // Land on the first book that will actually render in this environment
     // (a reachable local PDF, or an embeddable Drive file), else just the first book.
-    selectedBook =
-      books.find((b) => bookPdfAvailable(b) || driveEmbedUrl(b.sourceUrl)) || books[0] || null;
+    selectedBook = books.find(rendersInline) || books[0] || null;
     selectedChapterIndex =
       selectedBook && selectedBook.chapters && selectedBook.chapters.length ? 0 : null;
   }
