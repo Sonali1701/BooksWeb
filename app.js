@@ -527,6 +527,53 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+function setupInstall() {
+  const installBtn = document.querySelector("#installBtn");
+  const iosHint = document.querySelector("#iosHint");
+  const iosHintClose = document.querySelector("#iosHintClose");
+  if (!installBtn) return;
+
+  let deferredPrompt = null;
+
+  const isStandalone = () =>
+    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  if (isStandalone()) return; // already installed — no button needed
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    installBtn.hidden = false;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    installBtn.hidden = true;
+    if (iosHint) iosHint.hidden = true;
+  });
+
+  // iOS has no install prompt — show the button so we can display instructions.
+  if (isIos()) installBtn.hidden = false;
+
+  installBtn.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.hidden = true;
+    } else if (isIos() && iosHint) {
+      iosHint.hidden = !iosHint.hidden;
+    }
+  });
+
+  if (iosHintClose && iosHint) {
+    iosHintClose.addEventListener("click", () => {
+      iosHint.hidden = true;
+    });
+  }
+}
+
 async function init() {
   FILTERS.forEach((filter) => {
     filter.el = document.querySelector(`#${filter.key}Filter`);
@@ -548,6 +595,7 @@ async function init() {
 
   setupFilters();
   bindEvents();
+  setupInstall();
   renderBooks();
   renderReader();
 }
