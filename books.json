@@ -1,5 +1,91 @@
 [
   {
+    "id": "ncert-physics-11",
+    "title": "NCERT Physics - Class 11",
+    "subject": "Physics",
+    "class": "11",
+    "wing": "Board",
+    "language": "English",
+    "year": "2023",
+    "author": "NCERT",
+    "publication": "NCERT",
+    "description": "Official NCERT Class 11 Physics textbook, read chapter-wise.",
+    "sourceUrl": "https://ncert.nic.in/textbook.php",
+    "pdf": "",
+    "chapters": [
+      {
+        "title": "Chapter 1: Units and Measurements",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch01.pdf"
+      },
+      {
+        "title": "Chapter 2: Motion in a Straight Line",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch02.pdf"
+      },
+      {
+        "title": "Chapter 3: Motion in a Plane",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch03.pdf"
+      },
+      {
+        "title": "Chapter 4: Laws of Motion",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch04.pdf"
+      },
+      {
+        "title": "Chapter 5: Work, Energy and Power",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch05.pdf"
+      },
+      {
+        "title": "Chapter 6: System of Particles and Rotational Motion",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch06.pdf"
+      },
+      {
+        "title": "Chapter 7: Gravitation",
+        "unit": "Part I",
+        "pdf": "ncert-physics-11/ch07.pdf"
+      },
+      {
+        "title": "Chapter 8: Mechanical Properties of Solids",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch08.pdf"
+      },
+      {
+        "title": "Chapter 9: Mechanical Properties of Fluids",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch09.pdf"
+      },
+      {
+        "title": "Chapter 10: Thermal Properties of Matter",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch10.pdf"
+      },
+      {
+        "title": "Chapter 11: Thermodynamics",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch11.pdf"
+      },
+      {
+        "title": "Chapter 12: Kinetic Theory",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch12.pdf"
+      },
+      {
+        "title": "Chapter 13: Oscillations",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch13.pdf"
+      },
+      {
+        "title": "Chapter 14: Waves",
+        "unit": "Part II",
+        "pdf": "ncert-physics-11/ch14.pdf"
+      }
+    ]
+  },
+  {
     "id": "campbell-biology-10e",
     "title": "Campbell Biology (Tenth Edition)",
     "subject": "Biology",
