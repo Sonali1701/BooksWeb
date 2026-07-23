@@ -21,6 +21,42 @@ http://localhost:8000
 You can still open `index.html` directly, but many browsers block local `books.json`
 loading. In that case the app shows a small built-in sample.
 
+## Public deployment
+
+This repository is ready to deploy as a free public site with GitHub Pages. The workflow
+in [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) publishes the
+site whenever `main` is pushed.
+
+1. Create a public GitHub repository and push this folder to its `main` branch.
+2. In the repository, open **Settings → Pages** and select **GitHub Actions** as the source.
+3. Open **Actions → Deploy Open Books to GitHub Pages** to follow the first deployment.
+
+For a repository named `BooksWeb`, the default URL is:
+
+```text
+https://YOUR_USER.github.io/BooksWeb/
+```
+
+The included NCERT Physics chapter PDFs are hosted directly by the site. Catalog entries
+that point to public Google Drive *files* can use Drive's inline preview; Drive *folders*
+open in a new tab because a folder cannot be embedded as a PDF.
+
+Only publish material that you have permission to distribute.
+
+## Using a separate public PDF repository
+
+The app supports a second GitHub Pages repository for chapter PDFs. Set `pdfBaseUrl` in
+[`config.js`](config.js) to its public Pages URL:
+
+```js
+window.OPEN_BOOKS_CONFIG = {
+  pdfBaseUrl: "https://YOUR_USER.github.io/open-books-pdfs"
+};
+```
+
+Relative `pdf` and chapter `pdf` values in `books.json` will then resolve from that URL.
+Absolute `https://` PDF URLs continue to work unchanged.
+
 ## Catalog data (`books.json`)
 
 `books.json` is generated from the **NEET Content Tracker** workbook (the `External Source`
@@ -45,7 +81,14 @@ JSON array; each entry has:
 
 The five filters (Subject, Class, Wing, Language, Year) are generated automatically from
 whatever values appear in `books.json` — add a new subject or year and it shows up in the
-dropdowns without any code change.
+dropdowns without any code change. A sixth **Access** filter is derived automatically and
+separates hosted PDFs, Drive previews, Drive folders, and external links.
+
+The local `NEET CONTENT TRACKER - Sheet1.csv` export is a 39-row internal project tracker
+with columns such as `Project Name`, `Planner`, and `Drive Link`; it is intentionally
+excluded from this public repository and is not the source catalog for these 291 books.
+To regenerate the catalog, export the workbook's **External Source** and
+**New Category Books** tabs instead.
 
 ## Chapter-wise books (like NCERT)
 

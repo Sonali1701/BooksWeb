@@ -1,4 +1,6 @@
 const CATALOG_URL = "books.json";
+const APP_CONFIG = window.OPEN_BOOKS_CONFIG || {};
+const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, "");
 
 const fallbackBooks = [
   {
@@ -20,7 +22,8 @@ const FILTERS = [
   { key: "class", el: null, active: "All" },
   { key: "wing", el: null, active: "All" },
   { key: "language", el: null, active: "All" },
-  { key: "year", el: null, active: "All" }
+  { key: "year", el: null, active: "All" },
+  { key: "access", el: null, active: "All" }
 ];
 
 let books = [];
@@ -76,14 +79,28 @@ function sortValues(key, values) {
     const order = { "11": 1, "12": 2, "11 & 12": 3 };
     return values.sort((a, b) => (order[a] || 99) - (order[b] || 99) || a.localeCompare(b));
   }
+  if (key === "access") {
+    const order = {
+      "Hosted here": 1,
+      "Drive preview": 2,
+      "Drive folder": 3,
+      "External link": 4,
+      Unavailable: 5
+    };
+    return values.sort((a, b) => (order[a] || 99) - (order[b] || 99) || a.localeCompare(b));
+  }
   if (key === "year") {
     return values.sort((a, b) => b.localeCompare(a));
   }
   return values.sort((a, b) => a.localeCompare(b));
 }
 
+function valueForFilter(book, key) {
+  return key === "access" ? accessInfo(book).label : book[key];
+}
+
 function uniqueValues(key) {
-  const values = [...new Set(books.map((book) => book[key]).filter(Boolean))];
+  const values = [...new Set(books.map((book) => valueForFilter(book, key)).filter(Boolean))];
   return ["All", ...sortValues(key, values)];
 }
 
@@ -104,11 +121,12 @@ function filtersActive() {
 function bookMatchesFilters(book, query) {
   const searchable = [
     book.title, book.subject, book.class, book.wing,
-    book.language, book.year, book.description, book.author, book.publication
+    book.language, book.year, book.description, book.author, book.publication,
+    accessInfo(book).label
   ].join(" ").toLowerCase();
 
   const passesFilters = FILTERS.every(
-    (filter) => filter.active === "All" || book[filter.key] === filter.active
+    (filter) => filter.active === "All" || valueForFilter(book, filter.key) === filter.active
   );
 
   return passesFilters && searchable.includes(query);
@@ -135,6 +153,7 @@ function renderBooks() {
     const chapterBadge = book.chapters && book.chapters.length
       ? `<span class="chapter-badge">${book.chapters.length} chapters</span>`
       : "";
+    const access = accessInfo(book);
 
     const card = document.createElement("button");
     card.className = `book-card ${selectedBook && book.id === selectedBook.id ? "active" : ""}`;
@@ -152,6 +171,7 @@ function renderBooks() {
           <span class="tag">Class ${escapeHtml(book.class)}</span>
           <span class="tag">${escapeHtml(book.wing)}</span>
           <span class="tag">${escapeHtml(book.language)}</span>
+          <span class="access-badge access-${access.kind}">${escapeHtml(access.label)}</span>
           ${chapterBadge}
         </span>
       </span>
@@ -284,16 +304,26 @@ function readInitialSelection() {
 }
 
 function showPdf(pdfPath, page) {
+  const resolvedPath = resolvePdfUrl(pdfPath);
   const hash = page ? `#page=${page}` : "#view=FitH";
-  const src = encodeURI(pdfPath) + hash;
+  const src = encodeURI(resolvedPath) + hash;
   let iframe = pdfFrame.querySelector("iframe.pdf-embed");
 
-  if (!iframe || currentPdfPath !== pdfPath) {
+  if (!iframe || currentPdfPath !== resolvedPath) {
     pdfFrame.innerHTML = `<iframe class="pdf-embed" src="${escapeHtml(src)}" title="${escapeHtml(selectedBook.title)}"></iframe>`;
-    currentPdfPath = pdfPath;
+    currentPdfPath = resolvedPath;
   } else {
     iframe.src = src;
   }
+}
+
+function resolvePdfUrl(path) {
+  const value = String(path || "").trim();
+  if (!value || /^(?:[a-z]+:)?\/\//i.test(value) || /^(?:data|blob):/i.test(value)) {
+    return value;
+  }
+  if (!PDF_BASE_URL) return value;
+  return `${PDF_BASE_URL}/${value.replace(/^\.?\//, "")}`;
 }
 
 // A local-only book's PDF is only reachable when the site runs on your machine.
@@ -330,6 +360,21 @@ function driveEmbedUrl(url) {
   return match ? `https://drive.google.com/file/d/${match[1]}/preview` : null;
 }
 
+function isDriveFolderUrl(url) {
+  return /drive\.google\.com\/(?:drive\/)?folders\//i.test(String(url || ""));
+}
+
+function accessInfo(book) {
+  const hasHostedPdf =
+    bookPdfAvailable(book) ||
+    Boolean(book.chapters && book.chapters.some((chapter) => chapter.pdf));
+  if (hasHostedPdf) return { kind: "hosted", label: "Hosted here" };
+  if (driveEmbedUrl(book.sourceUrl)) return { kind: "drive", label: "Drive preview" };
+  if (isDriveFolderUrl(book.sourceUrl)) return { kind: "folder", label: "Drive folder" };
+  if (book.sourceUrl) return { kind: "external", label: "External link" };
+  return { kind: "unavailable", label: "Unavailable" };
+}
+
 // Show an embeddable source (currently Google Drive preview) inline in the reader.
 function showEmbed(book) {
   const embed = driveEmbedUrl(book.sourceUrl);
@@ -346,13 +391,16 @@ function showEmbed(book) {
 
 function showNoPdf(book) {
   currentPdfPath = null;
+  const isFolder = isDriveFolderUrl(book.sourceUrl);
   const sourceButton = book.sourceUrl
-    ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open original source</a>`
+    ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">${isFolder ? "Open folder in Drive" : "Open original source"}</a>`
     : "";
   pdfFrame.innerHTML = `
     <div class="pdf-placeholder">
-      <strong>PDF not added locally yet</strong>
-      <p>Download <em>${escapeHtml(book.title)}</em> from its original source, save it in the <code>pdfs/</code> folder, then set the <code>pdf</code> path for this entry in <code>books.json</code> to show it inline here.</p>
+      <strong>${isFolder ? "This resource is a Google Drive folder" : "No hosted PDF yet"}</strong>
+      <p>${isFolder
+        ? `Folders cannot open inside the PDF reader. Open <em>${escapeHtml(book.title)}</em> in Drive, then choose a file.`
+        : `Open <em>${escapeHtml(book.title)}</em> at its original source. To make it available inline, add a public PDF or chapter-PDF URL to <code>books.json</code>.`}</p>
       ${sourceButton}
     </div>`;
 }
@@ -400,9 +448,11 @@ function renderReaderView() {
     readerFileStatus.textContent = "Displayed from Google Drive";
     showEmbed(book);
   } else {
-    readerFileStatus.textContent = book.sourceUrl
-      ? "Open original source to view or download"
-      : "No PDF linked yet";
+    readerFileStatus.textContent = isDriveFolderUrl(book.sourceUrl)
+      ? "Google Drive folder — open it to choose a file"
+      : book.sourceUrl
+        ? "Open original source to view or download"
+        : "No PDF linked yet";
     showNoPdf(book);
   }
 }
@@ -419,7 +469,12 @@ function renderReader() {
   renderFacts(book);
 
   sourceLink.hidden = !book.sourceUrl;
-  if (book.sourceUrl) sourceLink.href = book.sourceUrl;
+  if (book.sourceUrl) {
+    sourceLink.href = book.sourceUrl;
+    sourceLink.textContent = isDriveFolderUrl(book.sourceUrl)
+      ? "Open folder in Drive"
+      : "Open original source";
+  }
 
   completeBook.hidden = !(book.pdf && book.chapters && book.chapters.length);
 

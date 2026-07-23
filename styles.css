@@ -381,7 +381,7 @@ h2 {
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 0;
   padding: 12px;
@@ -724,6 +724,34 @@ h2 {
   color: #fff;
   font-size: 10.5px;
   font-weight: 800;
+}
+
+.access-badge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.access-hosted {
+  color: #fff;
+  background: #197149;
+}
+
+.access-drive {
+  color: #17456f;
+  background: #dcecf8;
+}
+
+.access-folder {
+  color: #70530d;
+  background: #f7e9bd;
+}
+
+.access-external,
+.access-unavailable {
+  color: #5f6266;
+  background: #eceeef;
 }
 
 .reader-panel {
