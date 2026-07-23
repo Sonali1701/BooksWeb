@@ -22,6 +22,10 @@ html {
 
 body {
   margin: 0;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
   color: var(--ink);
   background: var(--paper);
   font-family: Inter, Arial, sans-serif;
@@ -42,7 +46,11 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 10px clamp(16px, 4vw, 56px);
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(clamp(16px, 4vw, 56px), env(safe-area-inset-right))
+    10px
+    max(clamp(16px, 4vw, 56px), env(safe-area-inset-left));
   background: rgba(251, 250, 246, 0.92);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(16px);
@@ -326,6 +334,7 @@ h2 {
 .reader-section,
 .list-section {
   padding: clamp(16px, 2.5vw, 28px) clamp(16px, 4vw, 56px);
+  scroll-margin-top: 84px;
 }
 
 .catalog-section {
@@ -681,6 +690,18 @@ h2 {
   transition: background 0.12s, border-color 0.12s;
 }
 
+.chapter-button span,
+.chapter-button small {
+  display: block;
+}
+
+.chapter-button small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .chapter-button:hover {
   background: #eef3f0;
 }
@@ -752,6 +773,16 @@ h2 {
 .access-unavailable {
   color: #5f6266;
   background: #eceeef;
+}
+
+.access-restricted {
+  color: #7b4917;
+  background: #f7e3cc;
+}
+
+.access-missing {
+  color: #8a2d28;
+  background: #f6d9d6;
 }
 
 .reader-panel {
@@ -1068,6 +1099,8 @@ code {
 
   .reader-sidebar {
     position: static;
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
   }
 
   .resource-grid {
@@ -1081,6 +1114,39 @@ code {
   .footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .topbar {
+    gap: 8px;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      8px
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .brand small {
+    display: none;
+  }
+
+  .topnav {
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    font-size: 13px;
+    scrollbar-width: none;
+  }
+
+  .topnav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-section,
+  .reader-section,
+  .list-section {
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-left: max(12px, env(safe-area-inset-left));
+    scroll-margin-top: 142px;
   }
 
   .topnav {
@@ -1112,7 +1178,21 @@ code {
   }
 
   .reader-toolbar {
+    display: grid;
     grid-template-columns: 40px minmax(0, 1fr) 40px;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .reader-tools {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tool-button {
+    min-height: 44px;
+    padding: 8px;
   }
 
   .icon-button {
@@ -1120,7 +1200,62 @@ code {
     height: 40px;
   }
 
+  .reader-sidebar {
+    padding: 14px;
+  }
+
+  .chapter-list {
+    max-height: 54dvh;
+  }
+
+  .chapter-button {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .pdf-frame {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .pdf-embed {
+    height: calc(100dvh - 190px);
+    min-height: 500px;
+    border-radius: 6px;
+  }
+
+  .pdf-placeholder {
+    margin-top: 0;
+    padding: 18px;
+  }
+
+  .footer {
+    padding-bottom: max(22px, env(safe-area-inset-bottom));
+  }
+
   .material-details div {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .install-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .book-card {
+    grid-template-columns: 58px minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .book-cover {
+    width: 54px;
+    height: 84px;
+  }
+
+  .pdf-embed {
+    height: calc(100dvh - 178px);
+    min-height: 440px;
   }
 }

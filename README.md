@@ -43,6 +43,31 @@ open in a new tab because a folder cannot be embedded as a PDF.
 
 Only publish material that you have permission to distribute.
 
+## Verified Drive resources
+
+The generated [`resource-meta.json`](resource-meta.json) records anonymous access checks
+for every catalog entry. The current snapshot contains:
+
+- 32 catalog entries backed by 31 public Drive PDFs
+- 43 public Drive folders with 659 child files available in the in-app file browser
+- 18 public PDFs with 420 extracted bookmark/page divisions
+- explicit `Restricted` and `Missing` states for sources that visitors cannot open
+
+Public Drive books with embedded PDF bookmarks receive chapter/section navigation
+automatically. Selecting a section opens the Drive preview at its starting page. Public
+folders receive a searchable file list; PDF children open directly in the reader.
+
+Regenerate the metadata after Drive permissions or folder contents change:
+
+```powershell
+py scripts/sync_resource_metadata.py
+py scripts/sync_resource_metadata.py --reuse-audit --extract-chapters --max-file-mb 200
+```
+
+The sync script uses `requests`, `gdown`, and `PyMuPDF`. PDFs used for bookmark extraction
+are downloaded one at a time to temporary storage and deleted immediately; book files are
+not added to the repository.
+
 ## Using a separate public PDF repository
 
 The app supports a second GitHub Pages repository for chapter PDFs. Set `pdfBaseUrl` in
@@ -82,7 +107,8 @@ JSON array; each entry has:
 The five filters (Subject, Class, Wing, Language, Year) are generated automatically from
 whatever values appear in `books.json` — add a new subject or year and it shows up in the
 dropdowns without any code change. A sixth **Access** filter is derived automatically and
-separates hosted PDFs, Drive previews, Drive folders, and external links.
+separates hosted PDFs, public previews, public folders, external links, restricted
+resources, and missing sources.
 
 The local `NEET CONTENT TRACKER - Sheet1.csv` export is a 39-row internal project tracker
 with columns such as `Project Name`, `Planner`, and `Drive Link`; it is intentionally
@@ -111,14 +137,13 @@ Each chapter can open in one of two ways:
 - `pdf` opens a standalone file (leave `page` out).
 - `unit` (optional) groups chapters under a heading in the Contents list.
 
-The included **Campbell Biology (Tenth Edition)** entry is a live demo of Mode A — its 55
-chapters were read directly from the PDF's bookmarks.
+Public Google Drive PDFs with bookmarks are live examples of Mode A: the metadata sync
+extracts their section titles and starting pages without publishing copies of the books.
 
 ## Hosting large PDFs
 
 Browsers must download the whole file to open it, and **GitHub Pages rejects any file over
-100 MB**. The Campbell sample PDF is ~274 MB, so it works locally but cannot be hosted as-is.
-For production:
+100 MB**. For production:
 
 - **Prefer Mode B** (one PDF per chapter) — each file is small, fast, and well under the limit.
 - Or keep large books on Google Drive and rely on `sourceUrl` (no hosting needed).
