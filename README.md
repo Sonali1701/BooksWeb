@@ -82,6 +82,17 @@ Create credentials → API key** — and it must be restricted before publishing
 So restricted, the key is public-safe: it works only from your site and only for Drive reads.
 Unrestricted, anyone who views source could spend your quota.
 
+A website-restricted key is refused from anywhere else, **including a local server**. Add
+`http://localhost:8000/*` to the same list to test the route locally; without it, local runs
+fall back to the sign-in path.
+
+The bytes have to be fetched and re-wrapped rather than linked to directly. Drive's media
+response carries `Content-Disposition: attachment`, so a browser downloads it instead of
+rendering, and `X-Frame-Options: SAMEORIGIN`, so it cannot be framed here at all. Building a
+`blob:` URL from the bytes drops both headers. The endpoint does answer Range requests, so a
+future viewer could page through a large file instead of holding it in memory — the browser's
+built-in PDF viewer will not read a blob progressively, so that would mean bundling one.
+
 Drive can also decline for reasons the catalog cannot predict, and a cross-origin frame never
 reports failure back to us. So every Drive preview carries an **Open it here instead** link
 that switches that file to the API route for the session — the reader never has to wait for

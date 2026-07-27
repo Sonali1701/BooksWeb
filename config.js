@@ -27,5 +27,5 @@ window.OPEN_BOOKS_CONFIG = {
   // Without those two restrictions anyone could spend your quota with it.
   //
   // Leave "" to require sign-in for those files instead.
-  googleApiKey: ""
+  googleApiKey: "AIzaSyA4MemP8dJjVjMrbZ0HFE_sdqnbF-gWXXc"
 };

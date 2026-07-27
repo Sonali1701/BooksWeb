@@ -309,6 +309,16 @@
 
   // Returns a blob: URL the reader can hand straight to an <iframe>, which
   // keeps the document inside our own origin rather than a Google frame.
+  //
+  // The bytes have to be fetched rather than linked. Pointing an iframe at the
+  // media URL fails twice over: the response carries
+  // `Content-Disposition: attachment`, so a browser downloads it instead of
+  // rendering, and `X-Frame-Options: SAMEORIGIN`, so it cannot be framed from
+  // this origin at all. Re-wrapping the bytes ourselves drops both headers.
+  //
+  // The endpoint does honour Range requests (206), so a future viewer could
+  // page through a large file instead of holding it whole — the browser's own
+  // PDF viewer cannot, since it will not read from a blob progressively.
   async function fileBlobUrl(fileId, onProgress, publicFile) {
     const auth = await credentials(publicFile);
     const url = driveUrl(
