@@ -64,14 +64,34 @@ preview"*, no matter who owns them or how they are shared. Seven public entries 
 catalog are over that line, the largest at 552 MB.
 
 Because `resource-meta.json` records each file's size, those books never reach Drive's viewer
-at all. Signed in, they are fetched through the Drive API and shown from a `blob:` URL, which
-has no such limit. Signed out, the reader explains the situation and gives its size instead of
-letting Google's frame fail with no way forward.
+at all. They are fetched through the Drive API and shown from a `blob:` URL, which has no such
+limit.
+
+**Set `googleApiKey` in [`config.js`](config.js) and this needs no sign-in.** Google's REST API
+serves "anyone with the link" files to an API key with CORS headers, so the page can pull the
+bytes itself and render them — the size limit belongs to Drive's *viewer*, not to the file.
+Without a key, the same books require signing in, and a signed-out reader gets an explanation
+and the file's size rather than Google's dead-end panel.
+
+Creating the key takes a minute — **Google Cloud Console → APIs & Services → Credentials →
+Create credentials → API key** — and it must be restricted before publishing:
+
+- **Application restrictions → Websites**, add `https://YOUR_USER.github.io/*`
+- **API restrictions → Restrict key**, select **Google Drive API**
+
+So restricted, the key is public-safe: it works only from your site and only for Drive reads.
+Unrestricted, anyone who views source could spend your quota.
 
 Drive can also decline for reasons the catalog cannot predict, and a cross-origin frame never
 reports failure back to us. So every Drive preview carries an **Open it here instead** link
-that switches that book to the API route permanently for the session — the reader never has to
-wait for the app to notice something went wrong.
+that switches that file to the API route for the session — the reader never has to wait for
+the app to notice something went wrong.
+
+That link matters most inside **public folders**. Folder listings come from `gdown` and carry
+no file sizes at all, so an oversized child cannot be spotted in advance the way a catalogued
+book can; the escape hatch is the only route for the 659 files listed across 43 public folders.
+The choice is recorded per *file*, not per catalog entry, since one folder holds many files and
+usually only one of them is the problem.
 
 Files over 250 MB additionally warn before downloading: they are held in memory to be
 displayed, which a phone or an older machine may not manage.

@@ -14,6 +14,7 @@
 
   const CONFIG = window.OPEN_BOOKS_CONFIG || {};
   const CLIENT_ID = String(CONFIG.googleClientId || "").trim();
+  const API_KEY = String(CONFIG.googleApiKey || "").trim();
   const SCOPES = [
     "openid",
     "email",
@@ -235,17 +236,43 @@
     }
   }
 
+  function hasApiKey() {
+    return API_KEY !== "";
+  }
+
   async function ensureToken() {
     if (isSignedIn()) return token.value;
     if (!wasSignedIn()) throw failure("signedout", "Sign in with Google to open this file.");
     return requestToken("silent"); // expired mid-session; renew without a prompt
   }
 
-  async function driveFetch(path, params) {
-    const accessToken = await ensureToken();
+  // How a request identifies itself. A signed-in token opens anything the
+  // account can reach; an API key opens only "anyone with the link" files, but
+  // needs no sign-in at all — which is what lets an anonymous visitor read the
+  // public books that Drive's viewer will not render.
+  async function credentials(publicFile) {
+    if (isSignedIn()) {
+      return { headers: { Authorization: `Bearer ${token.value}` }, params: {} };
+    }
+    if (publicFile && hasApiKey()) {
+      return { headers: {}, params: { key: API_KEY } };
+    }
+    return {
+      headers: { Authorization: `Bearer ${await ensureToken()}` },
+      params: {}
+    };
+  }
+
+  function driveUrl(path, params, extra) {
     const url = new URL(`${DRIVE_API}/${path}`);
     Object.keys(params || {}).forEach((key) => url.searchParams.set(key, params[key]));
-    return fetch(url.toString(), { headers: { Authorization: `Bearer ${accessToken}` } });
+    Object.keys(extra || {}).forEach((key) => url.searchParams.set(key, extra[key]));
+    return url.toString();
+  }
+
+  async function driveFetch(path, params, publicFile) {
+    const auth = await credentials(publicFile);
+    return fetch(driveUrl(path, params, auth.params), { headers: auth.headers });
   }
 
   function accessError(status) {
@@ -264,11 +291,11 @@
 
   // Drive is the authority on access — the static audit in resource-meta.json
   // only ever knew what an anonymous visitor could see.
-  async function fileMeta(fileId) {
+  async function fileMeta(fileId, publicFile) {
     const response = await driveFetch(`files/${encodeURIComponent(fileId)}`, {
       fields: "id,name,mimeType,size,capabilities(canDownload)",
       supportsAllDrives: "true"
-    });
+    }, publicFile);
     if (!response.ok) throw accessError(response.status);
     const meta = await response.json();
     return {
@@ -282,10 +309,14 @@
 
   // Returns a blob: URL the reader can hand straight to an <iframe>, which
   // keeps the document inside our own origin rather than a Google frame.
-  async function fileBlobUrl(fileId, onProgress) {
-    const accessToken = await ensureToken();
-    const url = `${DRIVE_API}/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true`;
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  async function fileBlobUrl(fileId, onProgress, publicFile) {
+    const auth = await credentials(publicFile);
+    const url = driveUrl(
+      `files/${encodeURIComponent(fileId)}`,
+      { alt: "media", supportsAllDrives: "true" },
+      auth.params
+    );
+    const response = await fetch(url, { headers: auth.headers });
     if (!response.ok) throw accessError(response.status);
 
     const total = Number(response.headers.get("content-length") || 0);
@@ -309,6 +340,7 @@
 
   window.OpenBooksDrive = {
     isConfigured,
+    hasApiKey,
     isSignedIn,
     wasSignedIn,
     getUser,

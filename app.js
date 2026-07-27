@@ -711,9 +711,21 @@ function needsGoogleAuth(book) {
   return Boolean(driveFileId(book));
 }
 
-// Books the reader has explicitly asked to open through the API rather than
-// Drive's viewer, so a re-render does not bounce back to a frame that failed.
+// Drive file IDs the reader has explicitly asked to open through the API
+// rather than Drive's viewer, so a re-render does not bounce back to a frame
+// that already failed. Keyed by file rather than book, because a folder entry
+// holds many files and only one of them may be the problem.
 const driveApiForced = new Set();
+
+// True when a public file can be fetched with no sign-in at all, which an API
+// key allows for "anyone with the link" files.
+function driveCanReadPublic() {
+  return Boolean(window.OpenBooksDrive && window.OpenBooksDrive.hasApiKey());
+}
+
+function driveCanFetch(publicFile) {
+  return driveSignedIn() || (publicFile && driveCanReadPublic());
+}
 
 function driveFileSize(book) {
   return Number((book.resource || {}).size || 0);
@@ -774,7 +786,7 @@ function showSignInGate(book) {
 }
 
 function driveUsesApi(book) {
-  return driveApiForced.has(book.id) || driveTooLargeToPreview(book);
+  return driveApiForced.has(driveFileId(book)) || driveTooLargeToPreview(book);
 }
 
 // Shown when Drive cannot render a public file and nobody is signed in to
@@ -805,7 +817,10 @@ function showDriveMessage(book, key, heading, message, actions) {
 let driveRequestId = 0;
 
 function showAuthorisedDrive(book, page) {
-  const fileId = driveFileId(book);
+  openDriveFile(book, driveFileId(book), book.title, page, isPublicDriveFile(book));
+}
+
+function openDriveFile(book, fileId, label, page, publicFile) {
   const request = ++driveRequestId;
   const current = selectedBook;
 
@@ -814,10 +829,10 @@ function showAuthorisedDrive(book, page) {
     return;
   }
 
-  showDriveMessage(book, "drive-checking", "Checking your access…",
-    `Asking Google Drive whether this account can open <em>${escapeHtml(book.title)}</em>.`);
+  showDriveMessage(book, `drive-checking-${fileId}`, "Opening…",
+    `Asking Google Drive for <em>${escapeHtml(label)}</em>.`);
 
-  window.OpenBooksDrive.fileMeta(fileId).then((meta) => {
+  window.OpenBooksDrive.fileMeta(fileId, publicFile).then((meta) => {
     if (request !== driveRequestId || selectedBook !== current) return;
 
     if (!meta.canDownload) {
@@ -842,13 +857,13 @@ function showAuthorisedDrive(book, page) {
         ? " A file this large needs a lot of memory — on a phone or an older machine, downloading it from Drive and opening it outside the browser may work better."
         : "";
       showDriveMessage(book, `drive-confirm-${fileId}`, "Ready to open",
-        `You have access to <em>${escapeHtml(meta.name || book.title)}</em>. It is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.${caution}`,
-        `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}">Open document (${escapeHtml(formatBytes(meta.size))})</button>` +
+        `<em>${escapeHtml(meta.name || label)}</em> is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.${caution}`,
+        `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}" data-public="${publicFile ? "1" : ""}">Open document (${escapeHtml(formatBytes(meta.size))})</button>` +
         driveLinkButton(book, "Open in Drive instead"));
       return;
     }
 
-    loadDriveFile(book, fileId, page, meta);
+    loadDriveFile(book, fileId, page, meta, publicFile);
   }).catch((error) => {
     if (request !== driveRequestId || selectedBook !== current) return;
     showDriveError(book, error);
@@ -869,6 +884,17 @@ function showDriveError(book, error) {
   }
   const account = driveAccountLabel();
   if (code === "forbidden" || code === "notfound") {
+    // Anonymous reads go through the API key, so a refusal there says nothing
+    // about any account — pointing at one would send the reader hunting in the
+    // wrong place.
+    if (!driveSignedIn()) {
+      showDriveMessage(book, `drive-${code}-anon`, "Could not read this file",
+        `${escapeHtml(error.message)} It may not be shared publicly, or the API key may not be permitted on this site. Signing in with an account that has access is the surest route.`,
+        (driveConfigured()
+          ? '<button class="button primary" type="button" data-action="google-signin">Sign in with Google</button>'
+          : "") + driveLinkButton(book, "Open in Drive"));
+      return;
+    }
     showDriveMessage(book, `drive-${code}`, "No access with this account",
       `${escapeHtml(error.message)}${account ? ` You are signed in as ${escapeHtml(account)}.` : ""} Open it in Drive to request access, or switch to an account that already has it.`,
       driveLinkButton(book, "Request access in Drive") +
@@ -886,7 +912,7 @@ function driveAccountLabel() {
   return user ? (user.email || user.name || "") : "";
 }
 
-function loadDriveFile(book, fileId, page, meta) {
+function loadDriveFile(book, fileId, page, meta, publicFile) {
   const request = ++driveRequestId;
   const current = selectedBook;
   const total = (meta && meta.size) || 0;
@@ -904,7 +930,7 @@ function loadDriveFile(book, fileId, page, meta) {
       : `Downloading… ${formatBytes(received)}`;
   };
 
-  window.OpenBooksDrive.fileBlobUrl(fileId, onProgress).then((url) => {
+  window.OpenBooksDrive.fileBlobUrl(fileId, onProgress, publicFile).then((url) => {
     if (request !== driveRequestId || selectedBook !== current) {
       URL.revokeObjectURL(url); // a newer selection won this race
       return;
@@ -965,8 +991,8 @@ function showEmbed(book, page, restricted) {
   // Drive can decline to render for reasons the catalog cannot predict, and a
   // cross-origin frame never tells us it failed — so the way out is always on
   // screen rather than waiting for us to detect trouble.
-  const openHere = driveConfigured()
-    ? ` Not loading, or does Drive say it is too large? <button class="link-button" type="button" data-action="drive-open-here">Open it here instead</button>.`
+  const openHere = driveConfigured() || driveCanReadPublic()
+    ? ` Not loading, or does Drive say it is too large? <button class="link-button" type="button" data-action="drive-open-here" data-file="${escapeHtml(driveFileId(book))}">Open it here instead</button>.`
     : "";
   const hint = restricted
     ? `Preview shown for the Google account signed in to this browser.${pageHint} Blank or asking you to sign in? <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to sign in or request access, or <button class="link-button" type="button" data-action="reset-drive-preview">use a different account</button>.`
@@ -980,10 +1006,23 @@ function showEmbed(book, page, restricted) {
 
 function showFolderItem(book, item) {
   const preview = item.previewUrl || driveEmbedUrl(item.url);
+  const fileId = item.fileId || "";
+
+  // Folder listings carry no file sizes, so an oversized child cannot be
+  // spotted in advance the way a catalogued book can — it has to be offered
+  // the same way out after Drive declines to render it.
+  if (fileId && driveApiForced.has(fileId) && driveCanFetch(true)) {
+    openDriveFile(book, fileId, item.title, null, true);
+    return;
+  }
+
   if (preview) {
+    const openHere = fileId && (driveConfigured() || driveCanReadPublic())
+      ? ` Not loading, or too large for Drive to preview? <button class="link-button" type="button" data-action="drive-open-here" data-file="${escapeHtml(fileId)}">Open it here instead</button>.`
+      : "";
     renderFrame(`folder:${preview}`, `
       <iframe class="pdf-embed" src="${escapeHtml(preview)}" title="${escapeHtml(item.title)}" allow="autoplay" allowfullscreen></iframe>
-      <p class="pdf-hint">Public file from <em>${escapeHtml(book.title)}</em>. <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Open in Drive</a>.</p>`);
+      <p class="pdf-hint">Public file from <em>${escapeHtml(book.title)}</em>. <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Open in Drive</a>.${openHere}</p>`);
     return;
   }
   renderFrame(`folder-item:${book.id}:${item.fileId || item.title}`, `
@@ -1031,6 +1070,7 @@ function wholeBookStatus(book, hasChapters) {
   if (isPublicDriveFile(book) && driveUsesApi(book)) {
     const account = driveAccountLabel();
     if (driveSignedIn()) return account ? `Google Drive · ${account}` : "Opened from Google Drive";
+    if (driveCanReadPublic()) return "Opened from Google Drive";
     const size = driveFileSize(book);
     return size ? `${formatBytes(size)} — too large for Drive's preview` : "Too large for Drive's preview";
   }
@@ -1056,7 +1096,8 @@ function showWholeBook(book, page) {
     showLocalOnly(book);
   } else if (isPublicDriveFile(book) && driveUsesApi(book)) {
     // Public, but Drive's viewer will not render it — fetch it ourselves.
-    if (driveSignedIn()) showAuthorisedDrive(book, page);
+    // An API key covers this without anyone signing in.
+    if (driveCanFetch(true)) showAuthorisedDrive(book, page);
     else showTooLargeGate(book);
   } else if (isPublicDriveFile(book)) {
     // Public and within Drive's limits — the free frame beats a download.
@@ -1294,10 +1335,10 @@ function handleViewerAction(action, trigger) {
     return;
   }
   if (action === "drive-open-here" && selectedBook) {
-    // Recorded before signing in, so the re-render that follows does not fall
+    // Recorded before any sign-in, so the re-render that follows does not fall
     // straight back to the Drive frame the reader just rejected.
-    driveApiForced.add(selectedBook.id);
-    if (driveSignedIn()) {
+    driveApiForced.add(trigger.dataset.file || driveFileId(selectedBook));
+    if (driveCanFetch(true)) {
       currentViewKey = null;
       renderReaderView();
     } else {
@@ -1311,7 +1352,8 @@ function handleViewerAction(action, trigger) {
     return;
   }
   if (action === "drive-load" && selectedBook) {
-    loadDriveFile(selectedBook, trigger.dataset.file, currentChapterPage());
+    loadDriveFile(selectedBook, trigger.dataset.file, currentChapterPage(), null,
+      trigger.dataset.public === "1");
   }
 }
 
