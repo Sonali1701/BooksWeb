@@ -7,6 +7,12 @@ const MOBILE_QUERY = "(max-width: 900px)";
 const DRIVE_SIGNIN_KEY = "obl:drive-signin";
 // Anything larger is downloaded only when the reader explicitly asks.
 const DRIVE_AUTOLOAD_LIMIT = 25 * 1024 * 1024;
+// Drive's own viewer refuses to render a PDF past roughly this size
+// ("This file is too large to preview"), whatever the sharing settings.
+// Files above it skip the Drive frame and are fetched through the API.
+const DRIVE_PREVIEW_LIMIT = 100 * 1024 * 1024;
+// Holding one of these in memory is heavy enough to warn about first.
+const DRIVE_HEAVY_LIMIT = 250 * 1024 * 1024;
 
 const fallbackBooks = [
   {
@@ -700,6 +706,21 @@ function needsGoogleAuth(book) {
   return Boolean(driveFileId(book));
 }
 
+// Books the reader has explicitly asked to open through the API rather than
+// Drive's viewer, so a re-render does not bounce back to a frame that failed.
+const driveApiForced = new Set();
+
+function driveFileSize(book) {
+  return Number((book.resource || {}).size || 0);
+}
+
+// Known up front from the metadata sync, so an oversized book never has to
+// fail in Drive's viewer first to find out.
+function driveTooLargeToPreview(book) {
+  const size = driveFileSize(book);
+  return size > 0 && size > DRIVE_PREVIEW_LIMIT && Boolean(driveFileId(book));
+}
+
 function driveConfigured() {
   return Boolean(window.OpenBooksDrive && window.OpenBooksDrive.isConfigured());
 }
@@ -747,6 +768,24 @@ function showSignInGate(book) {
     </div>`);
 }
 
+function driveUsesApi(book) {
+  return driveApiForced.has(book.id) || driveTooLargeToPreview(book);
+}
+
+// Shown when Drive cannot render a public file and nobody is signed in to
+// fetch it another way. It states the size rather than letting Google's
+// viewer fail first with no explanation.
+function showTooLargeGate(book) {
+  const size = driveFileSize(book);
+  const sizeText = size ? ` (${formatBytes(size)})` : "";
+  const signIn = driveConfigured()
+    ? '<button class="button primary" type="button" data-action="google-signin">Sign in with Google to open it here</button>'
+    : "";
+  showDriveMessage(book, `toobig:${book.id}`, "Too large for Google's preview",
+    `<em>${escapeHtml(book.title)}</em>${escapeHtml(sizeText)} is past the size Drive's own viewer will display, so it cannot be shown in a Drive frame. Signing in lets the reader fetch the file directly and open it here instead.`,
+    signIn + driveLinkButton(book, "Download from Drive"));
+}
+
 function showDriveMessage(book, key, heading, message, actions) {
   renderFrame(`${key}:${book.id}`, `
     <div class="pdf-placeholder pdf-gate">
@@ -792,8 +831,13 @@ function showAuthorisedDrive(book, page) {
     // Large books are a real download on a phone, so they are never pulled
     // without the reader asking for them.
     if (meta.size && meta.size > DRIVE_AUTOLOAD_LIMIT) {
+      // The file is held in memory to be displayed, so the heaviest ones come
+      // with a warning rather than an unexplained crash on a small device.
+      const caution = meta.size > DRIVE_HEAVY_LIMIT
+        ? " A file this large needs a lot of memory — on a phone or an older machine, downloading it from Drive and opening it outside the browser may work better."
+        : "";
       showDriveMessage(book, `drive-confirm-${fileId}`, "Ready to open",
-        `You have access to <em>${escapeHtml(meta.name || book.title)}</em>. It is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.`,
+        `You have access to <em>${escapeHtml(meta.name || book.title)}</em>. It is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.${caution}`,
         `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}">Open document (${escapeHtml(formatBytes(meta.size))})</button>` +
         driveLinkButton(book, "Open in Drive instead"));
       return;
@@ -913,9 +957,15 @@ function showEmbed(book, page, restricted) {
     : "";
   // A cross-origin frame cannot report failure to us, so restricted files
   // always carry a way out rather than leaving the visitor at a blank frame.
+  // Drive can decline to render for reasons the catalog cannot predict, and a
+  // cross-origin frame never tells us it failed — so the way out is always on
+  // screen rather than waiting for us to detect trouble.
+  const openHere = driveConfigured()
+    ? ` Not loading, or does Drive say it is too large? <button class="link-button" type="button" data-action="drive-open-here">Open it here instead</button>.`
+    : "";
   const hint = restricted
     ? `Preview shown for the Google account signed in to this browser.${pageHint} Blank or asking you to sign in? <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to sign in or request access, or <button class="link-button" type="button" data-action="reset-drive-preview">use a different account</button>.`
-    : `Displayed from Google Drive.${pageHint} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.`;
+    : `Displayed from Google Drive.${pageHint} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.${openHere}`;
 
   renderFrame(`embed:${embed}:${restricted ? "auth" : "public"}`, `
     <iframe class="pdf-embed" src="${escapeHtml(embed)}" title="${escapeHtml(book.title)}" allow="autoplay" allowfullscreen></iframe>
@@ -973,6 +1023,12 @@ function showNoPdf(book) {
 function wholeBookStatus(book, hasChapters) {
   if (bookPdfAvailable(book)) return hasChapters ? "Complete book" : book.pdf;
   if (book.localOnly) return "Local-only sample";
+  if (isPublicDriveFile(book) && driveUsesApi(book)) {
+    const account = driveAccountLabel();
+    if (driveSignedIn()) return account ? `Google Drive · ${account}` : "Opened from Google Drive";
+    const size = driveFileSize(book);
+    return size ? `${formatBytes(size)} — too large for Drive's preview` : "Too large for Drive's preview";
+  }
   if (isPublicDriveFile(book)) return "Displayed from Google Drive";
   if (driveConfigured() && needsGoogleAuth(book)) {
     const account = driveAccountLabel();
@@ -993,8 +1049,12 @@ function showWholeBook(book, page) {
     showPdf(book.pdf, page || null);
   } else if (book.localOnly) {
     showLocalOnly(book);
+  } else if (isPublicDriveFile(book) && driveUsesApi(book)) {
+    // Public, but Drive's viewer will not render it — fetch it ourselves.
+    if (driveSignedIn()) showAuthorisedDrive(book, page);
+    else showTooLargeGate(book);
   } else if (isPublicDriveFile(book)) {
-    // Public files need no session at all — the free iframe beats downloading.
+    // Public and within Drive's limits — the free frame beats a download.
     showEmbed(book, page);
   } else if (driveSignedIn() && needsGoogleAuth(book)) {
     showAuthorisedDrive(book, page);
@@ -1226,6 +1286,18 @@ function handleViewerAction(action, trigger) {
   }
   if (action === "google-signin" || action === "google-switch") {
     startGoogleSignIn(action === "google-switch" ? "switch" : "");
+    return;
+  }
+  if (action === "drive-open-here" && selectedBook) {
+    // Recorded before signing in, so the re-render that follows does not fall
+    // straight back to the Drive frame the reader just rejected.
+    driveApiForced.add(selectedBook.id);
+    if (driveSignedIn()) {
+      currentViewKey = null;
+      renderReaderView();
+    } else {
+      startGoogleSignIn();
+    }
     return;
   }
   if (action === "drive-retry") {

@@ -57,6 +57,25 @@ Public Drive books with embedded PDF bookmarks receive chapter/section navigatio
 automatically. Selecting a section opens the Drive preview at its starting page. Public
 folders receive a searchable file list; PDF children open directly in the reader.
 
+### Files Drive will not preview
+
+Drive's viewer refuses PDFs past roughly **100 MB** with *"This file is too large to
+preview"*, no matter who owns them or how they are shared. Seven public entries in this
+catalog are over that line, the largest at 552 MB.
+
+Because `resource-meta.json` records each file's size, those books never reach Drive's viewer
+at all. Signed in, they are fetched through the Drive API and shown from a `blob:` URL, which
+has no such limit. Signed out, the reader explains the situation and gives its size instead of
+letting Google's frame fail with no way forward.
+
+Drive can also decline for reasons the catalog cannot predict, and a cross-origin frame never
+reports failure back to us. So every Drive preview carries an **Open it here instead** link
+that switches that book to the API route permanently for the session — the reader never has to
+wait for the app to notice something went wrong.
+
+Files over 250 MB additionally warn before downloading: they are held in memory to be
+displayed, which a phone or an older machine may not manage.
+
 ### Restricted files and signing in
 
 `Restricted` records that a **signed-out** visitor cannot open the file — the sync script
