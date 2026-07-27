@@ -108,6 +108,19 @@ The reader then:
 The access token is kept in memory only, never in storage. A returning reader is re-authorised
 silently where the browser permits it, and simply sees the sign-in button where it does not.
 
+##### The prompt on arrival
+
+A sign-in dialog opens as the app loads, so signing in is not something to remember once a
+book has already refused to open. It invites the click rather than making it: browsers block
+an OAuth popup that was not opened by a user gesture, so the popup cannot be raised
+automatically.
+
+It appears only when it is useful — never when already signed in, and never again once
+**Browse without signing in** (or Esc) has been used. The one exception is a reader who has
+signed in before and whose silent re-authorisation failed: they meant to be signed in, so the
+prompt returns. Sign-in failures stay inside the dialog, since that is where a misconfigured
+origin is most likely to be noticed.
+
 ##### Setup this needs in Google Cloud
 
 The client ID alone is not enough — Google matches the requesting origin against an allow

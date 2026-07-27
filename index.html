@@ -166,6 +166,24 @@
 
   <div id="sheetScrim" class="sheet-scrim" hidden></div>
 
+  <!-- Shown on arrival so signing in is not something to remember later.
+       The popup itself must stay behind a real click: browsers block one
+       opened without a user gesture. -->
+  <dialog id="welcomeDialog" class="welcome-dialog" aria-labelledby="welcomeTitle">
+    <div class="welcome-inner">
+      <span class="welcome-mark" aria-hidden="true">OB</span>
+      <h2 id="welcomeTitle">Sign in to open every book</h2>
+      <p>Most of this library is shared with specific Google accounts. Signing in opens those
+        books right here — along with the large ones Google Drive refuses to preview.</p>
+      <p id="welcomeError" class="welcome-error" hidden></p>
+      <div class="welcome-actions">
+        <button id="welcomeSignIn" class="button primary" type="button">Sign in with Google</button>
+        <button id="welcomeSkip" class="button secondary" type="button">Browse without signing in</button>
+      </div>
+      <p class="welcome-note">You can sign in any time from the button in the top bar.</p>
+    </div>
+  </dialog>
+
   <nav class="tabbar" id="tabbar" aria-label="App sections">
     <button class="tab" type="button" data-view="library" aria-pressed="true">
       <span class="tab-icon" aria-hidden="true">&#9776;</span>

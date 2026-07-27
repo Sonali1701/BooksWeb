@@ -5,6 +5,7 @@ const APP_CONFIG = window.OPEN_BOOKS_CONFIG || {};
 const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, "");
 const MOBILE_QUERY = "(max-width: 900px)";
 const DRIVE_SIGNIN_KEY = "obl:drive-signin";
+const WELCOME_KEY = "obl:welcome-dismissed";
 // Anything larger is downloaded only when the reader explicitly asks.
 const DRIVE_AUTOLOAD_LIMIT = 25 * 1024 * 1024;
 // Drive's own viewer refuses to render a PDF past roughly this size
@@ -85,6 +86,10 @@ const tabbar = document.querySelector("#tabbar");
 const tabs = Array.from(document.querySelectorAll(".tab"));
 const backToLibrary = document.querySelector("#backToLibrary");
 const googleAuthBtn = document.querySelector("#googleAuthBtn");
+const welcomeDialog = document.querySelector("#welcomeDialog");
+const welcomeSignIn = document.querySelector("#welcomeSignIn");
+const welcomeSkip = document.querySelector("#welcomeSkip");
+const welcomeError = document.querySelector("#welcomeError");
 const sheetClose = document.querySelector("#sheetClose");
 const sheetScrim = document.querySelector("#sheetScrim");
 
@@ -1372,6 +1377,77 @@ function syncAuthButton() {
   measureChrome();
 }
 
+/* ---------- welcome prompt ---------- */
+
+function welcomeDismissed() {
+  try {
+    return localStorage.getItem(WELCOME_KEY) === "1";
+  } catch (e) {
+    return false;
+  }
+}
+
+function rememberWelcomeDismissed() {
+  try {
+    localStorage.setItem(WELCOME_KEY, "1");
+  } catch (e) { /* storage unavailable */ }
+}
+
+function shouldShowWelcome() {
+  if (!driveConfigured() || !welcomeDialog || !welcomeDialog.showModal) return false;
+  if (driveSignedIn()) return false;
+  // Someone who signed in before expects to still be signed in, so a failed
+  // silent restore brings the prompt back even if it was dismissed once.
+  if (window.OpenBooksDrive.wasSignedIn()) return true;
+  return !welcomeDismissed();
+}
+
+function showWelcome() {
+  if (!shouldShowWelcome() || welcomeDialog.open) return;
+  welcomeError.hidden = true;
+  try {
+    welcomeDialog.showModal();
+  } catch (e) { /* older browsers simply keep the top-bar button */ }
+}
+
+function closeWelcome() {
+  if (welcomeDialog && welcomeDialog.open) welcomeDialog.close();
+}
+
+function bindWelcome() {
+  if (!welcomeDialog) return;
+
+  welcomeSignIn.addEventListener("click", () => {
+    welcomeError.hidden = true;
+    welcomeSignIn.disabled = true;
+    welcomeSignIn.textContent = "Signing in…";
+    window.OpenBooksDrive.signIn()
+      .then(() => {
+        rememberWelcomeDismissed();
+        closeWelcome();
+      })
+      .catch((error) => {
+        // Kept in the dialog: this is where a misconfigured origin shows up,
+        // and hiding it behind a closing panel would waste the one moment
+        // the reader is looking.
+        welcomeError.hidden = false;
+        welcomeError.textContent = (error && error.message) || "Sign-in failed.";
+      })
+      .finally(() => {
+        welcomeSignIn.disabled = false;
+        welcomeSignIn.textContent = "Sign in with Google";
+      });
+  });
+
+  welcomeSkip.addEventListener("click", () => {
+    rememberWelcomeDismissed();
+    closeWelcome();
+  });
+
+  // Esc counts as declining, so the prompt does not reappear next visit.
+  welcomeDialog.addEventListener("cancel", rememberWelcomeDismissed);
+}
+
 function setupGoogleAuth() {
   if (!driveConfigured()) {
     googleAuthBtn.hidden = true;
@@ -1379,13 +1455,21 @@ function setupGoogleAuth() {
   }
   window.OpenBooksDrive.onChange(() => {
     syncAuthButton();
+    closeWelcome();
     currentViewKey = null; // access changed — re-resolve whatever is open
     renderReaderView();
   });
   syncAuthButton();
+  bindWelcome();
+
   // A returning reader is re-authorised without a prompt where the browser
-  // still allows it; if not, the sign-in button is simply left showing.
-  if (window.OpenBooksDrive.wasSignedIn()) window.OpenBooksDrive.restore();
+  // still allows it. The welcome prompt waits for that to settle so it never
+  // flashes in front of someone who is already signed in.
+  if (window.OpenBooksDrive.wasSignedIn()) {
+    window.OpenBooksDrive.restore().then(showWelcome, showWelcome);
+  } else {
+    showWelcome();
+  }
 }
 
 function scrollActiveChapterIntoView() {
