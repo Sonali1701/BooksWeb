@@ -1,7 +1,9 @@
 const CATALOG_URL = "books.json";
 const RESOURCE_META_URL = "resource-meta.json";
+const CHAPTER_MAP_URL = "chapters-map.json";
 const APP_CONFIG = window.OPEN_BOOKS_CONFIG || {};
 const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, "");
+const MOBILE_QUERY = "(max-width: 900px)";
 
 const fallbackBooks = [
   {
@@ -30,8 +32,9 @@ const FILTERS = [
 let books = [];
 let selectedBook = null;
 let selectedChapterIndex = null; // null = complete book / single PDF
-let currentPdfPath = null;
+let currentViewKey = null;
 let resourceSummary = null;
+let chapterMap = null;
 
 // Books flagged localOnly (large local demo files) only render when running locally.
 const IS_LOCAL = ["localhost", "127.0.0.1", ""].includes(location.hostname);
@@ -41,6 +44,8 @@ const searchInput = document.querySelector("#searchInput");
 const dataNotice = document.querySelector("#dataNotice");
 const resultCount = document.querySelector("#resultCount");
 const clearFilters = document.querySelector("#clearFilters");
+const filterPanel = document.querySelector("#filterPanel");
+const filterBadge = document.querySelector("#filterBadge");
 
 const readerTitle = document.querySelector("#reader-title");
 const readerMeta = document.querySelector("#readerMeta");
@@ -49,6 +54,7 @@ const sourceLink = document.querySelector("#sourceLink");
 const completeBook = document.querySelector("#completeBook");
 const contents = document.querySelector("#contents");
 const contentsLabel = document.querySelector("#contentsLabel");
+const contentsNote = document.querySelector("#contentsNote");
 const chapterCount = document.querySelector("#chapterCount");
 const chapterSearch = document.querySelector("#chapterSearch");
 const chapterList = document.querySelector("#chapterList");
@@ -58,9 +64,19 @@ const toggleSidebar = document.querySelector("#toggleSidebar");
 const fullscreenBtn = document.querySelector("#fullscreenBtn");
 const readerShell = document.querySelector(".reader-shell");
 const readerPanel = document.querySelector(".reader-panel");
+const readerSidebar = document.querySelector("#readerSidebar");
 const readerFileTitle = document.querySelector("#readerFileTitle");
 const readerFileStatus = document.querySelector("#readerFileStatus");
 const pdfFrame = document.querySelector("#pdfFrame");
+
+const topbar = document.querySelector("#topbar");
+const tabbar = document.querySelector("#tabbar");
+const tabs = Array.from(document.querySelectorAll(".tab"));
+const backToLibrary = document.querySelector("#backToLibrary");
+const sheetClose = document.querySelector("#sheetClose");
+const sheetScrim = document.querySelector("#sheetScrim");
+
+const mobileQuery = window.matchMedia(MOBILE_QUERY);
 
 const SUBJECT_COLORS = {
   Physics: "linear-gradient(145deg, #255c8e, #63a0a8)",
@@ -73,6 +89,70 @@ const SUBJECT_COLORS = {
 
 function colorForSubject(subject) {
   return SUBJECT_COLORS[subject] || "linear-gradient(145deg, #5e6a70, #d6a54c)";
+}
+
+function isMobile() {
+  return mobileQuery.matches;
+}
+
+/* ---------- layout ---------- */
+
+// The reader sizes itself against the space the header actually leaves, so a
+// short laptop window and a tall phone both get a full-height page view.
+function measureChrome() {
+  if (!topbar) return;
+  const height = Math.round(topbar.getBoundingClientRect().height);
+  if (height > 0) {
+    document.documentElement.style.setProperty("--topbar-h", `${height}px`);
+  }
+}
+
+function setView(view) {
+  document.body.dataset.view = view;
+  tabs.forEach((tab) => {
+    tab.setAttribute("aria-pressed", String(tab.dataset.view === view));
+  });
+}
+
+function openSheet() {
+  document.body.classList.add("sheet-open");
+  sheetScrim.hidden = false;
+  syncSidebarToggle();
+}
+
+function closeSheet() {
+  document.body.classList.remove("sheet-open");
+  sheetScrim.hidden = true;
+  syncSidebarToggle();
+}
+
+function sheetOpen() {
+  return document.body.classList.contains("sheet-open");
+}
+
+function syncSidebarToggle() {
+  if (isMobile()) {
+    const open = sheetOpen();
+    toggleSidebar.textContent = open ? "Close contents" : "Contents";
+    toggleSidebar.setAttribute("aria-pressed", String(open));
+    return;
+  }
+  const collapsed = readerShell.classList.contains("collapsed");
+  toggleSidebar.textContent = collapsed ? "Show panel" : "Hide panel";
+  toggleSidebar.setAttribute("aria-pressed", String(collapsed));
+}
+
+// Keep the two layouts from leaking into each other when the window crosses
+// the breakpoint (or a phone is rotated).
+function syncLayout() {
+  measureChrome();
+  if (isMobile()) {
+    readerShell.classList.remove("collapsed");
+  } else {
+    closeSheet();
+    filterPanel.open = true;
+  }
+  syncSidebarToggle();
 }
 
 /* ---------- filters ---------- */
@@ -119,8 +199,18 @@ function setupFilters() {
   FILTERS.forEach((filter) => fillSelect(filter.el, uniqueValues(filter.key)));
 }
 
+function activeFilterCount() {
+  return FILTERS.filter((filter) => filter.active !== "All").length;
+}
+
 function filtersActive() {
-  return FILTERS.some((f) => f.active !== "All") || searchInput.value.trim() !== "";
+  return activeFilterCount() > 0 || searchInput.value.trim() !== "";
+}
+
+function syncFilterBadge() {
+  const count = activeFilterCount();
+  filterBadge.hidden = count === 0;
+  filterBadge.textContent = String(count);
 }
 
 function bookMatchesFilters(book, query) {
@@ -137,101 +227,105 @@ function bookMatchesFilters(book, query) {
   return passesFilters && searchable.includes(query);
 }
 
-/* ---------- catalog ---------- */
+/* ---------- chapters ---------- */
 
-function renderBooks() {
-  const query = searchInput.value.trim().toLowerCase();
-  const filteredBooks = books.filter((book) => bookMatchesFilters(book, query));
-
-  resultCount.textContent = `${filteredBooks.length} of ${books.length} materials`;
-  clearFilters.hidden = !filtersActive();
-
-  bookGrid.innerHTML = "";
-
-  if (!filteredBooks.length) {
-    bookGrid.innerHTML =
-      '<p class="empty-state">No materials found. Try a different subject, class, wing, language, year, or search term.</p>';
-    return;
-  }
-
-  filteredBooks.forEach((book) => {
-    const collection = readerCollection(book);
-    const chapterBadge = collection.items.length
-      ? `<span class="chapter-badge">${collection.items.length} ${collection.mode === "folder" ? "files" : "sections"}</span>`
-      : "";
-    const access = accessInfo(book);
-
-    const card = document.createElement("button");
-    card.className = `book-card ${selectedBook && book.id === selectedBook.id ? "active" : ""}`;
-    card.type = "button";
-    card.innerHTML = `
-      <span class="book-cover" style="background: ${escapeHtml(colorForSubject(book.subject))}">
-        <span class="book-cover-subject">${escapeHtml(book.subject || "")}</span>
-      </span>
-      <span class="book-body">
-        <span class="book-format">${escapeHtml(book.wing || "Material")}${book.year ? " &middot; " + escapeHtml(book.year) : ""}</span>
-        <h3>${escapeHtml(book.title)}</h3>
-        <p>${escapeHtml(book.description || (book.publication ? book.publication : "Source available — open to view or download."))}</p>
-        <span class="tag-row">
-          <span class="tag">${escapeHtml(book.subject)}</span>
-          <span class="tag">Class ${escapeHtml(book.class)}</span>
-          <span class="tag">${escapeHtml(book.wing)}</span>
-          <span class="tag">${escapeHtml(book.language)}</span>
-          <span class="access-badge access-${access.kind}">${escapeHtml(access.label)}</span>
-          ${chapterBadge}
-        </span>
-      </span>
-    `;
-    card.addEventListener("click", () => selectBook(book));
-    bookGrid.appendChild(card);
-  });
-}
-
-/* ---------- reader ---------- */
-
-function selectBook(book) {
-  selectedBook = book;
-  selectedChapterIndex = readerCollection(book).items.length ? 0 : null;
-  currentPdfPath = null;
-  if (window.matchMedia("(max-width: 900px)").matches) {
-    readerShell.classList.add("collapsed");
-    syncSidebarToggle();
-  }
-  renderBooks();
-  renderReader();
-  document.querySelector("#reader").scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function renderFacts(book) {
-  const facts = [
-    ["Subject", book.subject],
-    ["Class", book.class],
-    ["Wing", book.wing],
-    ["Language", book.language],
-    ["Year", book.year],
-    ["Author", book.author],
-    ["Publication", book.publication]
-  ].filter(([, value]) => value);
-
-  readerFacts.innerHTML = facts
-    .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
-    .join("");
-}
-
+// Every book gets a table of contents when one can be established, in this
+// order: hand-authored or extracted chapters, then a public Drive folder
+// listing, then the standard syllabus outline for its subject and class.
 function readerCollection(book) {
   if (book && book.chapters && book.chapters.length) {
-    return { mode: "chapters", items: book.chapters };
+    return { mode: "chapters", items: book.chapters, navigable: true };
   }
   if (book && book.folderItems && book.folderItems.length) {
-    return { mode: "folder", items: book.folderItems };
+    return { mode: "folder", items: book.folderItems, navigable: true };
   }
-  return { mode: "none", items: [] };
+  if (book && book.syllabusChapters && book.syllabusChapters.length) {
+    return {
+      mode: "syllabus",
+      items: book.syllabusChapters,
+      navigable: false,
+      label: book.syllabusLabel || "standard syllabus"
+    };
+  }
+  return { mode: "none", items: [], navigable: false };
+}
+
+function subjectKeys(subject) {
+  const key = String(subject || "").trim().toLowerCase();
+  if (!key) return [];
+  const aliases = (chapterMap && chapterMap.aliases) || {};
+  return aliases[key] ? aliases[key].slice() : [key];
+}
+
+function classKeys(value) {
+  const text = String(value || "");
+  const keys = [];
+  if (/\b11\b/.test(text)) keys.push("11");
+  if (/\b12\b/.test(text)) keys.push("12");
+  return keys;
+}
+
+function titleCase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+// Build a reference outline from the syllabus map. Entries carry no page
+// numbers, so they are shown as contents rather than as jump targets.
+function buildSyllabusChapters(book) {
+  const syllabus = (chapterMap && chapterMap.syllabus) || null;
+  if (!syllabus) return { items: [], label: "" };
+
+  const subjects = subjectKeys(book.subject).filter((key) => syllabus[key]);
+  const classes = classKeys(book.class);
+  if (!subjects.length || !classes.length) return { items: [], label: "" };
+
+  const multiSubject = subjects.length > 1;
+  const multiClass = classes.length > 1;
+  const items = [];
+  const labels = [];
+
+  subjects.forEach((subjectKey) => {
+    const entry = syllabus[subjectKey];
+    if (entry.label && !labels.includes(entry.label)) labels.push(entry.label);
+    classes.forEach((classKey) => {
+      const chapters = entry[classKey] || [];
+      chapters.forEach((chapter, index) => {
+        const unit = [
+          multiSubject ? titleCase(subjectKey) : "",
+          multiClass ? `Class ${classKey}` : "",
+          chapter.unit || ""
+        ].filter(Boolean).join(" · ");
+        items.push({ title: chapter.title, unit, number: index + 1 });
+      });
+    });
+  });
+
+  // One subject reads well ("NCERT / NEET Biology syllabus"); stacking three
+  // of them does not, so combined books get a plain label.
+  const label = labels.length === 1 ? labels[0] : "standard NCERT / JEE / NEET syllabus";
+  return { items, label };
 }
 
 function folderGroup(item) {
   const path = String(item.path || "").replace(/\\/g, "/");
   const slash = path.lastIndexOf("/");
   return slash > 0 ? path.slice(0, slash) : "";
+}
+
+function collectionLabel(collection) {
+  if (collection.mode === "folder") return "Files";
+  if (collection.mode === "syllabus") return "Syllabus contents";
+  return "Contents";
+}
+
+function collectionUnit(collection, item) {
+  return collection.mode === "folder" ? folderGroup(item) : item.unit;
+}
+
+function collectionDetail(collection, item, index) {
+  if (collection.mode === "chapters" && item.page) return `Page ${item.page}`;
+  if (collection.mode === "syllabus") return `Chapter ${item.number || index + 1}`;
+  return "";
 }
 
 function renderChapterList(book) {
@@ -247,27 +341,32 @@ function renderChapterList(book) {
   }
 
   chapterSearch.value = "";
-  contentsLabel.textContent = collection.mode === "folder" ? "Files" : "Contents";
+  contentsLabel.textContent = collectionLabel(collection);
   chapterSearch.placeholder = collection.mode === "folder"
     ? "Find a file..."
     : "Find a chapter...";
   chapterCount.textContent = `(${collection.items.length})`;
 
+  contentsNote.hidden = collection.navigable;
+  if (!collection.navigable) {
+    contentsNote.textContent =
+      `Outline of the ${collection.label}. This material is one document, so the ` +
+      "list is for reference — use the viewer's page controls or search to reach a chapter.";
+  }
+
   let html = "";
   let lastUnit = null;
   collection.items.forEach((item, index) => {
-    const unit = collection.mode === "folder" ? folderGroup(item) : item.unit;
+    const unit = collectionUnit(collection, item);
     if (unit && unit !== lastUnit) {
       html += `<p class="unit-heading">${escapeHtml(unit)}</p>`;
       lastUnit = unit;
     }
-    const detail = collection.mode === "chapters" && item.page
-      ? `<small>Page ${escapeHtml(item.page)}</small>`
-      : "";
+    const detail = collectionDetail(collection, item, index);
     html += `
       <button class="chapter-button ${index === selectedChapterIndex ? "active" : ""}" type="button" data-index="${index}">
         <span>${escapeHtml(item.title)}</span>
-        ${detail}
+        ${detail ? `<small>${escapeHtml(detail)}</small>` : ""}
       </button>`;
   });
   chapterList.innerHTML = html;
@@ -276,6 +375,7 @@ function renderChapterList(book) {
     button.addEventListener("click", () => {
       selectedChapterIndex = Number(button.dataset.index);
       renderReaderView();
+      if (isMobile()) closeSheet();
     });
   });
 }
@@ -297,6 +397,98 @@ function filterChapters(query) {
     }
     heading.style.display = anyVisible ? "" : "none";
   });
+}
+
+/* ---------- catalog ---------- */
+
+function chapterBadgeFor(collection) {
+  const count = collection.items.length;
+  if (!count) return "";
+  if (collection.mode === "folder") return `<span class="chapter-badge">${count} files</span>`;
+  if (collection.mode === "syllabus") {
+    return `<span class="chapter-badge outline">${count} topics</span>`;
+  }
+  return `<span class="chapter-badge">${count} chapters</span>`;
+}
+
+function renderBooks() {
+  const query = searchInput.value.trim().toLowerCase();
+  const filteredBooks = books.filter((book) => bookMatchesFilters(book, query));
+
+  resultCount.textContent = `${filteredBooks.length} of ${books.length} materials`;
+  clearFilters.hidden = !filtersActive();
+  syncFilterBadge();
+
+  bookGrid.innerHTML = "";
+
+  if (!filteredBooks.length) {
+    bookGrid.innerHTML =
+      '<p class="empty-state">No materials found. Try a different subject, class, wing, language, year, or search term.</p>';
+    return;
+  }
+
+  filteredBooks.forEach((book) => {
+    const access = accessInfo(book);
+
+    const card = document.createElement("button");
+    card.className = `book-card ${selectedBook && book.id === selectedBook.id ? "active" : ""}`;
+    card.type = "button";
+    card.innerHTML = `
+      <span class="book-cover" style="background: ${escapeHtml(colorForSubject(book.subject))}">
+        <span class="book-cover-subject">${escapeHtml(book.subject || "")}</span>
+      </span>
+      <span class="book-body">
+        <span class="book-format">${escapeHtml(book.wing || "Material")}${book.year ? " &middot; " + escapeHtml(book.year) : ""}</span>
+        <h3>${escapeHtml(book.title)}</h3>
+        <p>${escapeHtml(book.description || (book.publication ? book.publication : "Source available — open to view or download."))}</p>
+        <span class="tag-row">
+          <span class="tag">${escapeHtml(book.subject)}</span>
+          <span class="tag">Class ${escapeHtml(book.class)}</span>
+          <span class="tag">${escapeHtml(book.wing)}</span>
+          <span class="tag">${escapeHtml(book.language)}</span>
+          <span class="access-badge access-${access.kind}">${escapeHtml(access.label)}</span>
+          ${chapterBadgeFor(readerCollection(book))}
+        </span>
+      </span>
+    `;
+    card.addEventListener("click", () => selectBook(book));
+    bookGrid.appendChild(card);
+  });
+}
+
+/* ---------- reader ---------- */
+
+function selectBook(book) {
+  const collection = readerCollection(book);
+  selectedBook = book;
+  // Reference outlines open on the whole document; real chapters open on the first one.
+  selectedChapterIndex = collection.navigable && collection.items.length ? 0 : null;
+  currentViewKey = null;
+  renderBooks();
+  renderReader();
+
+  if (isMobile()) {
+    setView("reader");
+    closeSheet();
+  } else {
+    document.querySelector("#reader").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function renderFacts(book) {
+  const facts = [
+    ["Subject", book.subject],
+    ["Class", book.class],
+    ["Wing", book.wing],
+    ["Language", book.language],
+    ["Year", book.year],
+    ["Author", book.author],
+    ["Publication", book.publication]
+  ].filter(([, value]) => value);
+
+  readerFacts.innerHTML = facts
+    .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
+    .join("");
 }
 
 function persistSelection() {
@@ -329,29 +521,44 @@ function readInitialSelection() {
 
   let index = null;
   const collection = readerCollection(book);
-  if (collection.items.length) {
+  if (collection.navigable && collection.items.length) {
     if (ch === "all") {
       index = null;
     } else {
       const n = Number(ch);
       index = Number.isInteger(n) && n >= 0 && n < collection.items.length ? n : 0;
     }
+  } else if (collection.items.length && ch !== "all") {
+    const n = Number(ch);
+    index = Number.isInteger(n) && n >= 0 && n < collection.items.length ? n : null;
   }
   return { book, index };
+}
+
+/* ---------- viewer ---------- */
+
+// Every viewer state is keyed so re-rendering the same document (for example
+// when stepping through a reference outline) never reloads the iframe.
+function renderFrame(key, html) {
+  if (currentViewKey === key) return;
+  currentViewKey = key;
+  pdfFrame.innerHTML = html;
 }
 
 function showPdf(pdfPath, page) {
   const resolvedPath = resolvePdfUrl(pdfPath);
   const hash = page ? `#page=${page}` : "#view=FitH";
   const src = encodeURI(resolvedPath) + hash;
-  let iframe = pdfFrame.querySelector("iframe.pdf-embed");
+  const key = `pdf:${resolvedPath}`;
+  const iframe = pdfFrame.querySelector("iframe.pdf-embed");
 
-  if (!iframe || currentPdfPath !== resolvedPath) {
-    pdfFrame.innerHTML = `<iframe class="pdf-embed" src="${escapeHtml(src)}" title="${escapeHtml(selectedBook.title)}"></iframe>`;
-    currentPdfPath = resolvedPath;
-  } else {
-    iframe.src = src;
+  if (currentViewKey === key && iframe) {
+    if (iframe.getAttribute("src") !== src) iframe.src = src;
+    return;
   }
+  currentViewKey = key;
+  pdfFrame.innerHTML =
+    `<iframe class="pdf-embed" src="${escapeHtml(src)}" title="${escapeHtml(selectedBook.title)}"></iframe>`;
 }
 
 function resolvePdfUrl(path) {
@@ -383,16 +590,15 @@ function rendersInline(book) {
 }
 
 function showLocalOnly(book) {
-  currentPdfPath = null;
   const sourceButton = book.sourceUrl
     ? `<a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open original source</a>`
     : "";
-  pdfFrame.innerHTML = `
+  renderFrame(`local:${book.id}`, `
     <div class="pdf-placeholder">
       <strong>Local-only sample</strong>
       <p><em>${escapeHtml(book.title)}</em> is a large demo file that is not hosted online. Run this project on your computer (<code>py -m http.server</code>) to read it here, or host each chapter as a small PDF for the live site.</p>
       ${sourceButton}
-    </div>`;
+    </div>`);
 }
 
 // Convert a Google Drive "file" link into an inline-embeddable preview URL.
@@ -443,32 +649,29 @@ function showEmbed(book, page) {
     showNoPdf(book);
     return false;
   }
-  currentPdfPath = "embed:" + embed;
-  pdfFrame.innerHTML = `
+  renderFrame(`embed:${embed}`, `
     <iframe class="pdf-embed" src="${escapeHtml(embed)}" title="${escapeHtml(book.title)}" allow="autoplay" allowfullscreen></iframe>
-    <p class="pdf-hint">Displayed from Google Drive.${page ? ` This section starts on page ${escapeHtml(page)}; use Drive's page control if it does not jump automatically.` : ""} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.</p>`;
+    <p class="pdf-hint">Displayed from Google Drive.${page ? ` This section starts on page ${escapeHtml(page)}; use Drive's page control if it does not jump automatically.` : ""} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.</p>`);
   return true;
 }
 
 function showFolderItem(book, item) {
   const preview = item.previewUrl || driveEmbedUrl(item.url);
-  currentPdfPath = preview ? `folder:${preview}` : null;
   if (preview) {
-    pdfFrame.innerHTML = `
+    renderFrame(`folder:${preview}`, `
       <iframe class="pdf-embed" src="${escapeHtml(preview)}" title="${escapeHtml(item.title)}" allow="autoplay" allowfullscreen></iframe>
-      <p class="pdf-hint">Public file from <em>${escapeHtml(book.title)}</em>. <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Open in Drive</a>.</p>`;
+      <p class="pdf-hint">Public file from <em>${escapeHtml(book.title)}</em>. <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Open in Drive</a>.</p>`);
     return;
   }
-  pdfFrame.innerHTML = `
+  renderFrame(`folder-item:${book.id}:${item.fileId || item.title}`, `
     <div class="pdf-placeholder">
       <strong>${escapeHtml(item.title)}</strong>
       <p>This folder item is not a PDF preview. Open it in Google Drive to view it.</p>
       ${item.url ? `<a class="button primary" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Open in Drive</a>` : ""}
-    </div>`;
+    </div>`);
 }
 
 function showNoPdf(book) {
-  currentPdfPath = null;
   const isFolder = isDriveFolderUrl(book.sourceUrl);
   const access = accessInfo(book);
   const sourceButton = book.sourceUrl
@@ -485,25 +688,61 @@ function showNoPdf(book) {
     heading = "Source is missing";
     message = "The catalogued source returned a missing-file response and may have been deleted or moved.";
   }
-  pdfFrame.innerHTML = `
+  renderFrame(`none:${book.id}:${access.kind}`, `
     <div class="pdf-placeholder">
       <strong>${heading}</strong>
       <p>${message}</p>
       ${sourceButton}
-    </div>`;
+    </div>`);
+}
+
+/* ---------- reader rendering ---------- */
+
+function wholeBookStatus(book, hasChapters) {
+  if (bookPdfAvailable(book)) return hasChapters ? "Complete book" : book.pdf;
+  if (book.localOnly) return "Local-only sample";
+  if (isPublicDriveFile(book)) return "Displayed from Google Drive";
+  if (isDriveFolderUrl(book.sourceUrl)) return "Google Drive folder — open it to choose a file";
+  return book.sourceUrl ? "Open original source to view or download" : "No PDF linked yet";
+}
+
+function showWholeBook(book, page) {
+  if (bookPdfAvailable(book)) {
+    showPdf(book.pdf, page || null);
+  } else if (book.localOnly) {
+    showLocalOnly(book);
+  } else if (isPublicDriveFile(book)) {
+    showEmbed(book, page);
+  } else {
+    showNoPdf(book);
+  }
 }
 
 function renderReaderView() {
   const book = selectedBook;
+  if (!book) return;
   const collection = readerCollection(book);
   const hasItems = collection.items.length > 0;
-  const hasChapters = collection.mode === "chapters";
   persistSelection();
 
   if (hasItems) {
     chapterList.querySelectorAll(".chapter-button").forEach((button) => {
       button.classList.toggle("active", Number(button.dataset.index) === selectedChapterIndex);
     });
+    prevChapter.disabled = selectedChapterIndex === null || selectedChapterIndex === 0;
+    nextChapter.disabled =
+      selectedChapterIndex !== null && selectedChapterIndex === collection.items.length - 1;
+  }
+
+  // Reference outline: the document never changes, only the label does.
+  if (collection.mode === "syllabus") {
+    const item = selectedChapterIndex !== null ? collection.items[selectedChapterIndex] : null;
+    readerFileTitle.textContent = item ? item.title : book.title;
+    readerFileStatus.textContent = item
+      ? `Chapter ${selectedChapterIndex + 1} of ${collection.items.length} · outline only`
+      : wholeBookStatus(book, false);
+    showWholeBook(book);
+    return;
   }
 
   if (hasItems && selectedChapterIndex !== null) {
@@ -512,49 +751,27 @@ function renderReaderView() {
     readerFileStatus.textContent = collection.mode === "folder"
       ? `File ${selectedChapterIndex + 1} of ${collection.items.length}`
       : `Section ${selectedChapterIndex + 1} of ${collection.items.length}${item.page ? ` · starts page ${item.page}` : ""}`;
-    prevChapter.disabled = selectedChapterIndex === 0;
-    nextChapter.disabled = selectedChapterIndex === collection.items.length - 1;
 
     if (collection.mode === "folder") {
       showFolderItem(book, item);
     } else if (item.pdf) {
       showPdf(item.pdf, item.page);
-    } else if (bookPdfAvailable(book)) {
-      showPdf(book.pdf, item.page);
-    } else if (book.localOnly) {
-      showLocalOnly(book);
-    } else if (isPublicDriveFile(book)) {
-      showEmbed(book, item.page);
     } else {
-      showNoPdf(book);
+      showWholeBook(book, item.page);
     }
     return;
   }
 
-  // complete book / no chapters
+  // Complete book / no chapters.
   readerFileTitle.textContent = book.title;
-  if (bookPdfAvailable(book)) {
-    readerFileStatus.textContent = hasChapters ? "Complete book" : book.pdf;
-    showPdf(book.pdf, null);
-  } else if (book.localOnly) {
-    readerFileStatus.textContent = "Local-only sample";
-    showLocalOnly(book);
-  } else if (isPublicDriveFile(book)) {
-    readerFileStatus.textContent = "Displayed from Google Drive";
-    showEmbed(book);
-  } else {
-    readerFileStatus.textContent = isDriveFolderUrl(book.sourceUrl)
-      ? "Google Drive folder — open it to choose a file"
-      : book.sourceUrl
-        ? "Open original source to view or download"
-        : "No PDF linked yet";
-    showNoPdf(book);
-  }
+  readerFileStatus.textContent = wholeBookStatus(book, collection.mode === "chapters");
+  showWholeBook(book);
 }
 
 function renderReader() {
   if (!selectedBook) return;
   const book = selectedBook;
+  const collection = readerCollection(book);
 
   readerTitle.textContent = book.title;
   readerMeta.textContent = [book.subject, `Class ${book.class}`, book.wing, book.language, book.year]
@@ -572,8 +789,8 @@ function renderReader() {
   }
 
   completeBook.hidden = !(
-    book.chapters &&
-    book.chapters.length &&
+    collection.mode === "chapters" &&
+    collection.items.length &&
     (bookPdfAvailable(book) || isPublicDriveFile(book))
   );
 
@@ -605,12 +822,33 @@ function bindEvents() {
   completeBook.addEventListener("click", () => {
     selectedChapterIndex = null;
     renderReaderView();
+    if (isMobile()) closeSheet();
   });
 
   toggleSidebar.addEventListener("click", () => {
+    if (isMobile()) {
+      if (sheetOpen()) closeSheet();
+      else openSheet();
+      return;
+    }
     readerShell.classList.toggle("collapsed");
     syncSidebarToggle();
   });
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      closeSheet();
+      setView(tab.dataset.view);
+    });
+  });
+
+  backToLibrary.addEventListener("click", () => {
+    closeSheet();
+    setView("library");
+  });
+
+  sheetClose.addEventListener("click", closeSheet);
+  sheetScrim.addEventListener("click", closeSheet);
 
   fullscreenBtn.addEventListener("click", () => {
     if (document.fullscreenElement) {
@@ -622,12 +860,18 @@ function bindEvents() {
 
   document.addEventListener("fullscreenchange", () => {
     const on = Boolean(document.fullscreenElement);
-    fullscreenBtn.innerHTML = on ? "&#10005; Exit fullscreen" : "&#9974; Fullscreen";
+    fullscreenBtn.innerHTML = on
+      ? "&#10005; <span>Exit fullscreen</span>"
+      : "&#9974; <span>Fullscreen</span>";
   });
 
   chapterSearch.addEventListener("input", () => filterChapters(chapterSearch.value));
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && sheetOpen()) {
+      closeSheet();
+      return;
+    }
     const tag = document.activeElement ? document.activeElement.tagName : "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
     if (!selectedBook || !readerCollection(selectedBook).items.length) return;
@@ -645,59 +889,89 @@ function bindEvents() {
     if (selectedChapterIndex === null) selectedChapterIndex = 0;
     selectedChapterIndex = Math.max(0, selectedChapterIndex - 1);
     renderReaderView();
+    scrollActiveChapterIntoView();
   });
 
   nextChapter.addEventListener("click", () => {
     const total = readerCollection(selectedBook).items.length;
-    if (selectedChapterIndex === null) selectedChapterIndex = 0;
+    if (selectedChapterIndex === null) selectedChapterIndex = -1;
     selectedChapterIndex = Math.min(total - 1, selectedChapterIndex + 1);
     renderReaderView();
+    scrollActiveChapterIntoView();
   });
+
+  // Layout follows the viewport, not a one-time guess at the device.
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener("change", syncLayout);
+  } else if (mobileQuery.addListener) {
+    mobileQuery.addListener(syncLayout); // Safari < 14
+  }
+  window.addEventListener("resize", measureChrome);
+  window.addEventListener("orientationchange", syncLayout);
+  if (window.ResizeObserver && topbar) {
+    new ResizeObserver(measureChrome).observe(topbar);
+  }
+}
+
+function scrollActiveChapterIntoView() {
+  const active = chapterList.querySelector(".chapter-button.active");
+  if (active) active.scrollIntoView({ block: "nearest" });
 }
 
 /* ---------- data ---------- */
 
-async function loadBooks() {
+async function fetchJson(url) {
   try {
-    const [catalogResponse, metadataResponse] = await Promise.all([
-      fetch(CATALOG_URL, { cache: "no-store" }),
-      fetch(RESOURCE_META_URL, { cache: "no-store" }).catch(() => null)
-    ]);
-    if (!catalogResponse.ok) throw new Error(`books.json returned ${catalogResponse.status}`);
-    const catalog = await catalogResponse.json();
-    const metadata = metadataResponse && metadataResponse.ok
-      ? await metadataResponse.json()
-      : { resources: {}, summary: null };
-    resourceSummary = metadata.summary || null;
-    books = catalog.map((book) => {
-      const resource = metadata.resources && metadata.resources[book.id]
-        ? metadata.resources[book.id]
-        : {};
-      return {
-        ...book,
-        resource,
-        chapters: book.chapters && book.chapters.length
-          ? book.chapters
-          : (resource.chapters || []),
-        folderItems: resource.folderItems || []
-      };
-    });
-    dataNotice.hidden = true;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.json();
   } catch (error) {
-    books = fallbackBooks;
-    dataNotice.hidden = false;
-    dataNotice.textContent =
-      "Using built-in sample data. Run the folder through a local server so books.json can load (see README).";
+    return null;
   }
 }
 
-function syncSidebarToggle() {
-  const collapsed = readerShell.classList.contains("collapsed");
-  const mobile = window.matchMedia("(max-width: 900px)").matches;
-  toggleSidebar.textContent = collapsed
-    ? (mobile ? "Browse details" : "Show panel")
-    : (mobile ? "Hide details" : "Hide panel");
-  toggleSidebar.setAttribute("aria-pressed", String(collapsed));
+async function loadBooks() {
+  const [catalog, metadata, map] = await Promise.all([
+    fetchJson(CATALOG_URL),
+    fetchJson(RESOURCE_META_URL),
+    fetchJson(CHAPTER_MAP_URL)
+  ]);
+
+  chapterMap = map;
+
+  if (!catalog) {
+    books = fallbackBooks.map(withDerivedChapters);
+    dataNotice.hidden = false;
+    dataNotice.textContent =
+      "Using built-in sample data. Run the folder through a local server so books.json can load (see README).";
+    return;
+  }
+
+  const resources = (metadata && metadata.resources) || {};
+  resourceSummary = (metadata && metadata.summary) || null;
+
+  books = catalog.map((book) => {
+    const resource = resources[book.id] || {};
+    return withDerivedChapters({
+      ...book,
+      resource,
+      chapters: book.chapters && book.chapters.length
+        ? book.chapters
+        : (resource.chapters || []),
+      folderItems: resource.folderItems || []
+    });
+  });
+  dataNotice.hidden = true;
+}
+
+function withDerivedChapters(book) {
+  const hasReal = Boolean(
+    (book.chapters && book.chapters.length) ||
+    (book.folderItems && book.folderItems.length)
+  );
+  if (hasReal) return book;
+  const syllabus = buildSyllabusChapters(book);
+  return { ...book, syllabusChapters: syllabus.items, syllabusLabel: syllabus.label };
 }
 
 function escapeHtml(value) {
@@ -727,6 +1001,7 @@ function setupInstall() {
     event.preventDefault();
     deferredPrompt = event;
     installBtn.hidden = false;
+    measureChrome();
   });
 
   window.addEventListener("appinstalled", () => {
@@ -763,12 +1038,6 @@ async function init() {
 
   await loadBooks();
 
-  if (window.matchMedia("(max-width: 900px)").matches) {
-    readerShell.classList.add("collapsed");
-  }
-  syncSidebarToggle();
-  window.addEventListener("resize", syncSidebarToggle);
-
   const initial = readInitialSelection();
   if (initial) {
     selectedBook = initial.book;
@@ -777,12 +1046,16 @@ async function init() {
     // Land on the first book that will actually render in this environment
     // (a reachable local PDF, or an embeddable Drive file), else just the first book.
     selectedBook = books.find(rendersInline) || books[0] || null;
-    selectedChapterIndex = selectedBook && readerCollection(selectedBook).items.length ? 0 : null;
+    const collection = readerCollection(selectedBook);
+    selectedChapterIndex = collection.navigable && collection.items.length ? 0 : null;
   }
 
   setupFilters();
   bindEvents();
   setupInstall();
+  setView(isMobile() && initial ? "reader" : "library");
+  if (isMobile()) filterPanel.open = false;
+  syncLayout();
   renderBooks();
   renderReader();
 }

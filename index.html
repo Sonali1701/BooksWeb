@@ -7,6 +7,7 @@
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1e7661">
+  <meta name="color-scheme" content="light">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <meta name="mobile-web-app-capable" content="yes">
@@ -19,11 +20,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <header class="topbar">
+<body data-view="library">
+  <header class="topbar" id="topbar">
     <a class="brand" href="#" aria-label="Open Books Library home">
       <span class="brand-mark">OB</span>
-      <span>
+      <span class="brand-text">
         <strong>Open Books</strong>
         <small>Digital Textbook Library</small>
       </span>
@@ -35,7 +36,7 @@
       <a href="#books">Materials</a>
     </nav>
 
-    <button id="installBtn" class="install-btn" type="button" hidden>&#11015; Install app</button>
+    <button id="installBtn" class="install-btn" type="button" hidden>&#11015; <span>Install app</span></button>
   </header>
 
   <div id="iosHint" class="ios-hint" hidden>
@@ -47,9 +48,9 @@
   <main>
     <section id="catalog" class="catalog-section" aria-labelledby="catalog-title">
       <div class="section-heading">
-        <div>
+        <div class="section-heading-copy">
           <h1 id="catalog-title">Digital Textbook Library</h1>
-          <p class="section-sub">Filter by subject, class, wing, language, and year — then read chapter-wise in the reader below.</p>
+          <p class="section-sub">Filter by subject, class, wing, language, and year — then read chapter-wise in the reader.</p>
         </div>
         <label class="search-box">
           <span>Search</span>
@@ -59,48 +60,66 @@
 
       <p id="dataNotice" class="data-notice" hidden></p>
 
-      <div class="filters" aria-label="Book filters" id="filters">
-        <label>
-          <span>Subject</span>
-          <select id="subjectFilter"></select>
-        </label>
-        <label>
-          <span>Class</span>
-          <select id="classFilter"></select>
-        </label>
-        <label>
-          <span>Wing</span>
-          <select id="wingFilter"></select>
-        </label>
-        <label>
-          <span>Language</span>
-          <select id="languageFilter"></select>
-        </label>
-        <label>
-          <span>Year</span>
-          <select id="yearFilter"></select>
-        </label>
-        <label>
-          <span>Access</span>
-          <select id="accessFilter"></select>
-        </label>
-      </div>
+      <details class="filter-panel" id="filterPanel" open>
+        <summary class="filter-summary">
+          <span>Filters</span>
+          <span id="filterBadge" class="filter-badge" hidden></span>
+        </summary>
+        <div class="filters" aria-label="Book filters" id="filters">
+          <label>
+            <span>Subject</span>
+            <select id="subjectFilter"></select>
+          </label>
+          <label>
+            <span>Class</span>
+            <select id="classFilter"></select>
+          </label>
+          <label>
+            <span>Wing</span>
+            <select id="wingFilter"></select>
+          </label>
+          <label>
+            <span>Language</span>
+            <select id="languageFilter"></select>
+          </label>
+          <label>
+            <span>Year</span>
+            <select id="yearFilter"></select>
+          </label>
+          <label>
+            <span>Access</span>
+            <select id="accessFilter"></select>
+          </label>
+        </div>
+      </details>
     </section>
 
     <section id="reader" class="reader-section" aria-labelledby="reader-title">
       <div class="reader-shell">
-        <aside class="reader-sidebar" aria-label="Selected material details">
+        <aside class="reader-sidebar" id="readerSidebar" aria-label="Selected material details">
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <button id="sheetClose" class="sheet-close" type="button" aria-label="Close contents">&times;</button>
+
           <p class="eyebrow">Now reading</p>
           <h2 id="reader-title">Select a material</h2>
           <p id="readerMeta" class="reader-meta">Subject | Class | Wing | Language | Year</p>
-          <dl id="readerFacts" class="reader-facts"></dl>
+
           <div class="reader-actions">
             <a id="sourceLink" class="button primary reader-download" href="#" target="_blank" rel="noreferrer" hidden>Open original source</a>
             <button id="completeBook" class="button secondary reader-download" type="button" hidden>Read complete book</button>
           </div>
 
+          <details class="reader-facts-panel">
+            <summary>Material details</summary>
+            <dl id="readerFacts" class="reader-facts"></dl>
+          </details>
+
           <div id="contents" class="contents" hidden>
-            <p class="contents-title"><span id="contentsLabel">Contents</span> <span id="chapterCount" class="contents-count"></span></p>
+            <p class="contents-title">
+              <span id="contentsLabel">Contents</span>
+              <span id="chapterCount" class="contents-count"></span>
+            </p>
+            <p id="contentsNote" class="contents-note" hidden></p>
             <input id="chapterSearch" class="chapter-search" type="search" placeholder="Find a chapter..." autocomplete="off">
             <div id="chapterList" class="chapter-list"></div>
           </div>
@@ -108,6 +127,7 @@
 
         <article class="reader-panel">
           <div class="reader-toolbar">
+            <button id="backToLibrary" class="icon-button back-button" type="button" aria-label="Back to library">&#8592;</button>
             <button id="prevChapter" class="icon-button" type="button" aria-label="Previous chapter" hidden>&lsaquo;</button>
             <div class="reader-toolbar-title">
               <strong id="readerFileTitle">No material selected</strong>
@@ -115,8 +135,8 @@
             </div>
             <button id="nextChapter" class="icon-button" type="button" aria-label="Next chapter" hidden>&rsaquo;</button>
             <div class="reader-tools">
-              <button id="toggleSidebar" class="tool-button" type="button" aria-pressed="false" title="Hide the details panel for a wider page">Hide panel</button>
-              <button id="fullscreenBtn" class="tool-button" type="button" title="Open the reader in fullscreen">&#9974; Fullscreen</button>
+              <button id="toggleSidebar" class="tool-button" type="button" aria-pressed="false" aria-controls="readerSidebar" title="Hide the details panel for a wider page">Hide panel</button>
+              <button id="fullscreenBtn" class="tool-button" type="button" title="Open the reader in fullscreen">&#9974; <span>Fullscreen</span></button>
             </div>
           </div>
 
@@ -134,12 +154,25 @@
 
       <div id="bookGrid" class="book-grid" aria-live="polite"></div>
     </section>
+
+    <footer class="footer">
+      <span>Open Books Library</span>
+      <span>Catalog source: local books.json + pdfs/ folder.</span>
+    </footer>
   </main>
 
-  <footer class="footer">
-    <span>Open Books Library</span>
-    <span>Catalog source: local books.json + pdfs/ folder.</span>
-  </footer>
+  <div id="sheetScrim" class="sheet-scrim" hidden></div>
+
+  <nav class="tabbar" id="tabbar" aria-label="App sections">
+    <button class="tab" type="button" data-view="library" aria-pressed="true">
+      <span class="tab-icon" aria-hidden="true">&#9776;</span>
+      <span>Library</span>
+    </button>
+    <button class="tab" type="button" data-view="reader" aria-pressed="false">
+      <span class="tab-icon" aria-hidden="true">&#128214;</span>
+      <span>Reader</span>
+    </button>
+  </nav>
 
   <script src="config.js"></script>
   <script src="app.js"></script>

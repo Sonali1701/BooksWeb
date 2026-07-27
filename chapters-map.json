@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "note": "Standard syllabus chapter lists used as a fallback table of contents. A book only falls back to this when it has no real chapters (per-chapter PDFs or extracted PDF bookmarks) and no public folder listing. These entries carry no page numbers, so the reader shows them as reference contents rather than jump targets.",
+  "aliases": {
+    "science": ["biology"],
+    "pcb": ["physics", "chemistry", "biology"],
+    "pcm": ["physics", "chemistry", "maths"],
+    "mathematics": ["maths"],
+    "math": ["maths"]
+  },
+  "syllabus": {
+    "physics": {
+      "label": "NCERT / JEE / NEET Physics syllabus",
+      "11": [
+        { "unit": "Physical World and Measurement", "title": "Units and Measurements" },
+        { "unit": "Kinematics", "title": "Motion in a Straight Line" },
+        { "unit": "Kinematics", "title": "Motion in a Plane" },
+        { "unit": "Laws of Motion", "title": "Laws of Motion" },
+        { "unit": "Work, Energy and Power", "title": "Work, Energy and Power" },
+        { "unit": "Rigid Body Dynamics", "title": "System of Particles and Rotational Motion" },
+        { "unit": "Gravitation", "title": "Gravitation" },
+        { "unit": "Properties of Bulk Matter", "title": "Mechanical Properties of Solids" },
+        { "unit": "Properties of Bulk Matter", "title": "Mechanical Properties of Fluids" },
+        { "unit": "Properties of Bulk Matter", "title": "Thermal Properties of Matter" },
+        { "unit": "Heat and Thermodynamics", "title": "Thermodynamics" },
+        { "unit": "Heat and Thermodynamics", "title": "Kinetic Theory of Gases" },
+        { "unit": "Oscillations and Waves", "title": "Oscillations" },
+        { "unit": "Oscillations and Waves", "title": "Waves" }
+      ],
+      "12": [
+        { "unit": "Electrostatics", "title": "Electric Charges and Fields" },
+        { "unit": "Electrostatics", "title": "Electrostatic Potential and Capacitance" },
+        { "unit": "Current Electricity", "title": "Current Electricity" },
+        { "unit": "Magnetic Effects of Current and Magnetism", "title": "Moving Charges and Magnetism" },
+        { "unit": "Magnetic Effects of Current and Magnetism", "title": "Magnetism and Matter" },
+        { "unit": "Electromagnetic Induction and Alternating Currents", "title": "Electromagnetic Induction" },
+        { "unit": "Electromagnetic Induction and Alternating Currents", "title": "Alternating Current" },
+        { "unit": "Electromagnetic Waves", "title": "Electromagnetic Waves" },
+        { "unit": "Optics", "title": "Ray Optics and Optical Instruments" },
+        { "unit": "Optics", "title": "Wave Optics" },
+        { "unit": "Modern Physics", "title": "Dual Nature of Radiation and Matter" },
+        { "unit": "Modern Physics", "title": "Atoms" },
+        { "unit": "Modern Physics", "title": "Nuclei" },
+        { "unit": "Electronic Devices", "title": "Semiconductor Electronics: Materials, Devices and Simple Circuits" }
+      ]
+    },
+    "chemistry": {
+      "label": "NCERT / JEE / NEET Chemistry syllabus",
+      "11": [
+        { "unit": "Basic Concepts", "title": "Some Basic Concepts of Chemistry" },
+        { "unit": "Atomic Structure and Periodicity", "title": "Structure of Atom" },
+        { "unit": "Atomic Structure and Periodicity", "title": "Classification of Elements and Periodicity in Properties" },
+        { "unit": "Bonding and States of Matter", "title": "Chemical Bonding and Molecular Structure" },
+        { "unit": "Bonding and States of Matter", "title": "States of Matter: Gases and Liquids" },
+        { "unit": "Physical Chemistry", "title": "Thermodynamics" },
+        { "unit": "Physical Chemistry", "title": "Equilibrium" },
+        { "unit": "Physical Chemistry", "title": "Redox Reactions" },
+        { "unit": "Inorganic Chemistry", "title": "Hydrogen" },
+        { "unit": "Inorganic Chemistry", "title": "The s-Block Elements" },
+        { "unit": "Inorganic Chemistry", "title": "The p-Block Elements (Groups 13 and 14)" },
+        { "unit": "Organic Chemistry", "title": "Organic Chemistry: Some Basic Principles and Techniques" },
+        { "unit": "Organic Chemistry", "title": "Hydrocarbons" },
+        { "unit": "Environmental Chemistry", "title": "Environmental Chemistry" }
+      ],
+      "12": [
+        { "unit": "Physical Chemistry", "title": "The Solid State" },
+        { "unit": "Physical Chemistry", "title": "Solutions" },
+        { "unit": "Physical Chemistry", "title": "Electrochemistry" },
+        { "unit": "Physical Chemistry", "title": "Chemical Kinetics" },
+        { "unit": "Physical Chemistry", "title": "Surface Chemistry" },
+        { "unit": "Inorganic Chemistry", "title": "General Principles and Processes of Isolation of Elements" },
+        { "unit": "Inorganic Chemistry", "title": "The p-Block Elements (Groups 15 to 18)" },
+        { "unit": "Inorganic Chemistry", "title": "The d- and f-Block Elements" },
+        { "unit": "Inorganic Chemistry", "title": "Coordination Compounds" },
+        { "unit": "Organic Chemistry", "title": "Haloalkanes and Haloarenes" },
+        { "unit": "Organic Chemistry", "title": "Alcohols, Phenols and Ethers" },
+        { "unit": "Organic Chemistry", "title": "Aldehydes, Ketones and Carboxylic Acids" },
+        { "unit": "Organic Chemistry", "title": "Amines" },
+        { "unit": "Applied Chemistry", "title": "Biomolecules" },
+        { "unit": "Applied Chemistry", "title": "Polymers" },
+        { "unit": "Applied Chemistry", "title": "Chemistry in Everyday Life" }
+      ]
+    },
+    "maths": {
+      "label": "NCERT / JEE Mathematics syllabus",
+      "11": [
+        { "unit": "Sets, Relations and Functions", "title": "Sets" },
+        { "unit": "Sets, Relations and Functions", "title": "Relations and Functions" },
+        { "unit": "Trigonometry", "title": "Trigonometric Functions" },
+        { "unit": "Algebra", "title": "Principle of Mathematical Induction" },
+        { "unit": "Algebra", "title": "Complex Numbers and Quadratic Equations" },
+        { "unit": "Algebra", "title": "Linear Inequalities" },
+        { "unit": "Algebra", "title": "Permutations and Combinations" },
+        { "unit": "Algebra", "title": "Binomial Theorem" },
+        { "unit": "Algebra", "title": "Sequences and Series" },
+        { "unit": "Coordinate Geometry", "title": "Straight Lines" },
+        { "unit": "Coordinate Geometry", "title": "Conic Sections" },
+        { "unit": "Coordinate Geometry", "title": "Introduction to Three Dimensional Geometry" },
+        { "unit": "Calculus", "title": "Limits and Derivatives" },
+        { "unit": "Mathematical Reasoning", "title": "Mathematical Reasoning" },
+        { "unit": "Statistics and Probability", "title": "Statistics" },
+        { "unit": "Statistics and Probability", "title": "Probability" }
+      ],
+      "12": [
+        { "unit": "Relations and Functions", "title": "Relations and Functions" },
+        { "unit": "Relations and Functions", "title": "Inverse Trigonometric Functions" },
+        { "unit": "Algebra", "title": "Matrices" },
+        { "unit": "Algebra", "title": "Determinants" },
+        { "unit": "Calculus", "title": "Continuity and Differentiability" },
+        { "unit": "Calculus", "title": "Application of Derivatives" },
+        { "unit": "Calculus", "title": "Integrals" },
+        { "unit": "Calculus", "title": "Application of Integrals" },
+        { "unit": "Calculus", "title": "Differential Equations" },
+        { "unit": "Vectors and 3D Geometry", "title": "Vector Algebra" },
+        { "unit": "Vectors and 3D Geometry", "title": "Three Dimensional Geometry" },
+        { "unit": "Linear Programming", "title": "Linear Programming" },
+        { "unit": "Probability", "title": "Probability" }
+      ]
+    },
+    "biology": {
+      "label": "NCERT / NEET Biology syllabus",
+      "11": [
+        { "unit": "Diversity in the Living World", "title": "The Living World" },
+        { "unit": "Diversity in the Living World", "title": "Biological Classification" },
+        { "unit": "Diversity in the Living World", "title": "Plant Kingdom" },
+        { "unit": "Diversity in the Living World", "title": "Animal Kingdom" },
+        { "unit": "Structural Organisation in Plants and Animals", "title": "Morphology of Flowering Plants" },
+        { "unit": "Structural Organisation in Plants and Animals", "title": "Anatomy of Flowering Plants" },
+        { "unit": "Structural Organisation in Plants and Animals", "title": "Structural Organisation in Animals" },
+        { "unit": "Cell: Structure and Function", "title": "Cell: The Unit of Life" },
+        { "unit": "Cell: Structure and Function", "title": "Biomolecules" },
+        { "unit": "Cell: Structure and Function", "title": "Cell Cycle and Cell Division" },
+        { "unit": "Plant Physiology", "title": "Transport in Plants" },
+        { "unit": "Plant Physiology", "title": "Mineral Nutrition" },
+        { "unit": "Plant Physiology", "title": "Photosynthesis in Higher Plants" },
+        { "unit": "Plant Physiology", "title": "Respiration in Plants" },
+        { "unit": "Plant Physiology", "title": "Plant Growth and Development" },
+        { "unit": "Human Physiology", "title": "Digestion and Absorption" },
+        { "unit": "Human Physiology", "title": "Breathing and Exchange of Gases" },
+        { "unit": "Human Physiology", "title": "Body Fluids and Circulation" },
+        { "unit": "Human Physiology", "title": "Excretory Products and their Elimination" },
+        { "unit": "Human Physiology", "title": "Locomotion and Movement" },
+        { "unit": "Human Physiology", "title": "Neural Control and Coordination" },
+        { "unit": "Human Physiology", "title": "Chemical Coordination and Integration" }
+      ],
+      "12": [
+        { "unit": "Reproduction", "title": "Reproduction in Organisms" },
+        { "unit": "Reproduction", "title": "Sexual Reproduction in Flowering Plants" },
+        { "unit": "Reproduction", "title": "Human Reproduction" },
+        { "unit": "Reproduction", "title": "Reproductive Health" },
+        { "unit": "Genetics and Evolution", "title": "Principles of Inheritance and Variation" },
+        { "unit": "Genetics and Evolution", "title": "Molecular Basis of Inheritance" },
+        { "unit": "Genetics and Evolution", "title": "Evolution" },
+        { "unit": "Biology and Human Welfare", "title": "Human Health and Disease" },
+        { "unit": "Biology and Human Welfare", "title": "Strategies for Enhancement in Food Production" },
+        { "unit": "Biology and Human Welfare", "title": "Microbes in Human Welfare" },
+        { "unit": "Biotechnology", "title": "Biotechnology: Principles and Processes" },
+        { "unit": "Biotechnology", "title": "Biotechnology and its Applications" },
+        { "unit": "Ecology and Environment", "title": "Organisms and Populations" },
+        { "unit": "Ecology and Environment", "title": "Ecosystem" },
+        { "unit": "Ecology and Environment", "title": "Biodiversity and Conservation" },
+        { "unit": "Ecology and Environment", "title": "Environmental Issues" }
+      ]
+    },
+    "botany": {
+      "label": "NEET Botany syllabus",
+      "11": [
+        { "unit": "Diversity in the Living World", "title": "The Living World" },
+        { "unit": "Diversity in the Living World", "title": "Biological Classification" },
+        { "unit": "Diversity in the Living World", "title": "Plant Kingdom" },
+        { "unit": "Structural Organisation in Plants", "title": "Morphology of Flowering Plants" },
+        { "unit": "Structural Organisation in Plants", "title": "Anatomy of Flowering Plants" },
+        { "unit": "Cell: Structure and Function", "title": "Cell: The Unit of Life" },
+        { "unit": "Cell: Structure and Function", "title": "Biomolecules" },
+        { "unit": "Cell: Structure and Function", "title": "Cell Cycle and Cell Division" },
+        { "unit": "Plant Physiology", "title": "Transport in Plants" },
+        { "unit": "Plant Physiology", "title": "Mineral Nutrition" },
+        { "unit": "Plant Physiology", "title": "Photosynthesis in Higher Plants" },
+        { "unit": "Plant Physiology", "title": "Respiration in Plants" },
+        { "unit": "Plant Physiology", "title": "Plant Growth and Development" }
+      ],
+      "12": [
+        { "unit": "Reproduction", "title": "Sexual Reproduction in Flowering Plants" },
+        { "unit": "Genetics and Evolution", "title": "Principles of Inheritance and Variation" },
+        { "unit": "Genetics and Evolution", "title": "Molecular Basis of Inheritance" },
+        { "unit": "Biology and Human Welfare", "title": "Strategies for Enhancement in Food Production" },
+        { "unit": "Biology and Human Welfare", "title": "Microbes in Human Welfare" },
+        { "unit": "Biotechnology", "title": "Biotechnology: Principles and Processes" },
+        { "unit": "Biotechnology", "title": "Biotechnology and its Applications" },
+        { "unit": "Ecology and Environment", "title": "Organisms and Populations" },
+        { "unit": "Ecology and Environment", "title": "Ecosystem" },
+        { "unit": "Ecology and Environment", "title": "Biodiversity and Conservation" },
+        { "unit": "Ecology and Environment", "title": "Environmental Issues" }
+      ]
+    },
+    "zoology": {
+      "label": "NEET Zoology syllabus",
+      "11": [
+        { "unit": "Diversity in the Living World", "title": "Animal Kingdom" },
+        { "unit": "Structural Organisation in Animals", "title": "Structural Organisation in Animals" },
+        { "unit": "Human Physiology", "title": "Digestion and Absorption" },
+        { "unit": "Human Physiology", "title": "Breathing and Exchange of Gases" },
+        { "unit": "Human Physiology", "title": "Body Fluids and Circulation" },
+        { "unit": "Human Physiology", "title": "Excretory Products and their Elimination" },
+        { "unit": "Human Physiology", "title": "Locomotion and Movement" },
+        { "unit": "Human Physiology", "title": "Neural Control and Coordination" },
+        { "unit": "Human Physiology", "title": "Chemical Coordination and Integration" }
+      ],
+      "12": [
+        { "unit": "Reproduction", "title": "Reproduction in Organisms" },
+        { "unit": "Reproduction", "title": "Human Reproduction" },
+        { "unit": "Reproduction", "title": "Reproductive Health" },
+        { "unit": "Genetics and Evolution", "title": "Evolution" },
+        { "unit": "Biology and Human Welfare", "title": "Human Health and Disease" },
+        { "unit": "Biology and Human Welfare", "title": "Animal Husbandry and Food Production" },
+        { "unit": "Biotechnology", "title": "Biotechnology and its Applications" }
+      ]
+    }
+  }
+}

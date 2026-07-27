@@ -140,6 +140,47 @@ Each chapter can open in one of two ways:
 Public Google Drive PDFs with bookmarks are live examples of Mode A: the metadata sync
 extracts their section titles and starting pages without publishing copies of the books.
 
+### Where a book's contents come from
+
+Every entry gets a table of contents when one can be established. The reader resolves it in
+priority order:
+
+| Source | Mode | Navigates? |
+| ------ | ---- | ---------- |
+| `chapters` in `books.json`, or bookmarks extracted into `resource-meta.json` | Contents | Yes — opens the chapter's PDF or page |
+| `folderItems` from a public Drive folder | Files | Yes — opens that file |
+| [`chapters-map.json`](chapters-map.json) syllabus outline for the entry's subject + class | Syllabus contents | No — reference outline only |
+
+Most catalog entries are single Drive documents with no bookmarks, so they fall back to the
+syllabus outline. That list is the standard NCERT / JEE / NEET chapter sequence, grouped by
+unit, and it is labelled **Syllabus contents** with an explicit note in the panel: it tells a
+student what the book covers, but it carries no page numbers, so it cannot jump. Selecting an
+entry names the chapter in the toolbar and leaves the document where it is.
+
+`chapters-map.json` holds the outlines for Physics, Chemistry, Maths, Biology, Botany, and
+Zoology across classes 11 and 12, plus `aliases` that route subjects such as `Pcb` to several
+lists at once. A `class` of `11 & 12` concatenates both years under `Class 11` / `Class 12`
+unit headings. Edit that file to correct or extend an outline — no code change is needed.
+
+## Screen sizes
+
+One build serves the laptop site and the installed mobile app.
+
+- **≥ 901 px** — filters, reader, and material list stack down one page. The reader sizes
+  itself to `100dvh` minus the measured header height, so the page view fits a short laptop
+  window without scrolling. **Hide panel** widens the document; **Fullscreen** removes the
+  chrome entirely.
+- **≤ 900 px** — the app becomes a two-view shell with a bottom tab bar: **Library**
+  (search, filters, cards) and **Reader**, which owns the whole viewport. The details panel
+  opens as a bottom sheet from the **Contents** button, and closes as soon as a chapter is
+  picked.
+- **≤ 480 px and landscape phones** — compacted chrome, single-column filters, and a
+  single-row toolbar so the document keeps the most space.
+
+Safe-area insets are respected on notched devices, and no view scrolls horizontally at any
+width. If you change the header, nothing needs recalculating — `app.js` measures it and
+publishes `--topbar-h` for the CSS.
+
 ## Hosting large PDFs
 
 Browsers must download the whole file to open it, and **GitHub Pages rejects any file over
