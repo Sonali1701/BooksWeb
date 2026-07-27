@@ -985,6 +985,23 @@ code {
   width: 100%;
 }
 
+.pdf-gate .gate-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.link-button {
+  padding: 0;
+  color: var(--green-dark);
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* ---------- sidebar collapse (desktop) ---------- */
 
 @media (min-width: 901px) {

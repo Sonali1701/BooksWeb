@@ -57,6 +57,36 @@ Public Drive books with embedded PDF bookmarks receive chapter/section navigatio
 automatically. Selecting a section opens the Drive preview at its starting page. Public
 folders receive a searchable file list; PDF children open directly in the reader.
 
+### Restricted files and signing in
+
+`Restricted` records that a **signed-out** visitor cannot open the file — the sync script
+checks every link anonymously. It does not mean *you* cannot open it. Drive's `/preview`
+iframe uses the browser's own Google session, so a reader signed in to an account that has
+access sees the document in place.
+
+Restricted single files therefore open a sign-in gate rather than a dead end:
+
+1. **Sign in / open in Drive** opens the file in a new tab, where Google handles signing in
+   or requesting access.
+2. **I am signed in — show the preview** embeds the Drive preview and remembers the choice
+   (`obl:drive-signin` in `localStorage`), so later restricted books skip the gate.
+3. Every restricted preview keeps an escape hatch beneath it — open in Drive, or **use a
+   different account** to return to the gate.
+
+That second button records the reader's own assertion, not a verified session: a
+cross-origin iframe cannot report back whether it rendered, so the app cannot detect the
+difference between a loaded document and a Google sign-in screen. The escape hatch is what
+covers the gap.
+
+**Browser caveat:** the preview relies on Google cookies inside a third-party frame. Chrome
+and Edge generally allow this; Safari's tracking prevention and Firefox's Total Cookie
+Protection often do not, and will show Google's sign-in screen inside the frame instead. In
+those browsers, **Open in Drive** is the reliable route. Public files are unaffected — they
+need no session at all.
+
+Restricted *folders* still cannot be embedded at any permission level, so they keep a panel
+pointing at Drive.
+
 Regenerate the metadata after Drive permissions or folder contents change:
 
 ```powershell

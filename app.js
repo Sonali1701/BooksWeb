@@ -4,6 +4,7 @@ const CHAPTER_MAP_URL = "chapters-map.json";
 const APP_CONFIG = window.OPEN_BOOKS_CONFIG || {};
 const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, "");
 const MOBILE_QUERY = "(max-width: 900px)";
+const DRIVE_SIGNIN_KEY = "obl:drive-signin";
 
 const fallbackBooks = [
   {
@@ -35,6 +36,7 @@ let selectedChapterIndex = null; // null = complete book / single PDF
 let currentViewKey = null;
 let resourceSummary = null;
 let chapterMap = null;
+let drivePreviewFallback = false; // used only when localStorage is unavailable
 
 // Books flagged localOnly (large local demo files) only render when running locally.
 const IS_LOCAL = ["localhost", "127.0.0.1", ""].includes(location.hostname);
@@ -584,6 +586,7 @@ function bookPdfAvailable(book) {
 function rendersInline(book) {
   if (bookPdfAvailable(book)) return true;
   if (isPublicDriveFile(book)) return true;
+  if (isRestrictedDriveFile(book) && drivePreviewEnabled()) return true;
   if (book.chapters && book.chapters.some((c) => c.pdf)) return true;
   if (book.folderItems && book.folderItems.some((item) => item.previewUrl)) return true;
   return false;
@@ -641,17 +644,73 @@ function isPublicDriveFile(book) {
   return Boolean(driveEmbedUrl(book.sourceUrl));
 }
 
+/* ---------- restricted Drive files ---------- */
+
+// `resource-meta.json` classifies access from an anonymous server-side check,
+// so "restricted" means "not readable by a signed-out visitor" — not "not
+// readable by this visitor". A signed-in Google account with access can see
+// the same preview, because the Drive iframe carries the browser's session.
+function isRestrictedDriveFile(book) {
+  const resource = book.resource || {};
+  return resource.access === "restricted" &&
+    resource.kind === "drive-file" &&
+    Boolean(driveEmbedUrl(book.sourceUrl));
+}
+
+// A remembered "I signed in, stop asking" choice. It is the visitor's own
+// assertion, not a verified session — we cannot read a cross-origin iframe to
+// confirm one, so the escape hatch below every preview matters.
+function drivePreviewEnabled() {
+  try {
+    return localStorage.getItem(DRIVE_SIGNIN_KEY) === "1";
+  } catch (e) {
+    return drivePreviewFallback;
+  }
+}
+
+function setDrivePreviewEnabled(enabled) {
+  drivePreviewFallback = enabled;
+  try {
+    if (enabled) localStorage.setItem(DRIVE_SIGNIN_KEY, "1");
+    else localStorage.removeItem(DRIVE_SIGNIN_KEY);
+  } catch (e) { /* storage unavailable — the in-memory flag still applies */ }
+}
+
+// Offered before embedding so a restricted file never renders as a bare
+// Google error frame with no way forward.
+function showSignInGate(book) {
+  renderFrame(`signin:${book.id}`, `
+    <div class="pdf-placeholder pdf-gate">
+      <strong>Sign in to preview this material</strong>
+      <p><em>${escapeHtml(book.title)}</em> is shared with specific Google accounts. Open it in Drive once to sign in (or to request access), then come back and the preview loads right here.</p>
+      <div class="gate-actions">
+        <a class="button primary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Sign in / open in Drive</a>
+        <button class="button secondary" type="button" data-action="enable-drive-preview">I am signed in — show the preview</button>
+      </div>
+    </div>`);
+}
+
 // Show an embeddable source (currently Google Drive preview) inline in the reader.
-function showEmbed(book, page) {
+function showEmbed(book, page, restricted) {
   const embedBase = driveEmbedUrl(book.sourceUrl);
   const embed = embedBase && page ? `${embedBase}#page=${page}` : embedBase;
   if (!embed) {
     showNoPdf(book);
     return false;
   }
-  renderFrame(`embed:${embed}`, `
+
+  const pageHint = page
+    ? ` This section starts on page ${escapeHtml(page)}; use Drive's page control if it does not jump automatically.`
+    : "";
+  // A cross-origin frame cannot report failure to us, so restricted files
+  // always carry a way out rather than leaving the visitor at a blank frame.
+  const hint = restricted
+    ? `Preview shown for the Google account signed in to this browser.${pageHint} Blank or asking you to sign in? <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to sign in or request access, or <button class="link-button" type="button" data-action="reset-drive-preview">use a different account</button>.`
+    : `Displayed from Google Drive.${pageHint} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.`;
+
+  renderFrame(`embed:${embed}:${restricted ? "auth" : "public"}`, `
     <iframe class="pdf-embed" src="${escapeHtml(embed)}" title="${escapeHtml(book.title)}" allow="autoplay" allowfullscreen></iframe>
-    <p class="pdf-hint">Displayed from Google Drive.${page ? ` This section starts on page ${escapeHtml(page)}; use Drive's page control if it does not jump automatically.` : ""} <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive</a> to download.</p>`);
+    <p class="pdf-hint">${hint}</p>`);
   return true;
 }
 
@@ -682,8 +741,12 @@ function showNoPdf(book) {
     ? `No public child files were found for <em>${escapeHtml(book.title)}</em>.`
     : `Open <em>${escapeHtml(book.title)}</em> at its original source.`;
   if (access.kind === "restricted") {
-    heading = "Access is restricted";
-    message = "This Drive resource requires a permitted Google account. It cannot be previewed anonymously.";
+    // Restricted single files are handled by the sign-in gate; what lands here
+    // is mostly folders, which Drive will not embed at any permission level.
+    heading = "Sign in to open this resource";
+    message = isFolder
+      ? "This Drive folder is shared with specific Google accounts, and folders cannot be embedded here. Open it in Drive with an account that has access."
+      : "This Drive resource is shared with specific Google accounts. Open it in Drive with an account that has access, or request access there.";
   } else if (access.kind === "missing") {
     heading = "Source is missing";
     message = "The catalogued source returned a missing-file response and may have been deleted or moved.";
@@ -702,6 +765,11 @@ function wholeBookStatus(book, hasChapters) {
   if (bookPdfAvailable(book)) return hasChapters ? "Complete book" : book.pdf;
   if (book.localOnly) return "Local-only sample";
   if (isPublicDriveFile(book)) return "Displayed from Google Drive";
+  if (isRestrictedDriveFile(book)) {
+    return drivePreviewEnabled()
+      ? "Drive preview — needs a signed-in account with access"
+      : "Sign in to Google to preview this material";
+  }
   if (isDriveFolderUrl(book.sourceUrl)) return "Google Drive folder — open it to choose a file";
   return book.sourceUrl ? "Open original source to view or download" : "No PDF linked yet";
 }
@@ -713,6 +781,9 @@ function showWholeBook(book, page) {
     showLocalOnly(book);
   } else if (isPublicDriveFile(book)) {
     showEmbed(book, page);
+  } else if (isRestrictedDriveFile(book)) {
+    if (drivePreviewEnabled()) showEmbed(book, page, true);
+    else showSignInGate(book);
   } else {
     showNoPdf(book);
   }
@@ -849,6 +920,17 @@ function bindEvents() {
 
   sheetClose.addEventListener("click", closeSheet);
   sheetScrim.addEventListener("click", closeSheet);
+
+  // The viewer's contents are re-rendered, so its controls are delegated.
+  pdfFrame.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-action]");
+    if (!trigger) return;
+    const action = trigger.dataset.action;
+    if (action !== "enable-drive-preview" && action !== "reset-drive-preview") return;
+    setDrivePreviewEnabled(action === "enable-drive-preview");
+    currentViewKey = null; // force the viewer to swap between gate and preview
+    renderReaderView();
+  });
 
   fullscreenBtn.addEventListener("click", () => {
     if (document.fullscreenElement) {
