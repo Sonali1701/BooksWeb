@@ -792,14 +792,15 @@ function driveUsesApi(book) {
 // Shown when Drive cannot render a public file and nobody is signed in to
 // fetch it another way. It states the size rather than letting Google's
 // viewer fail first with no explanation.
-function showTooLargeGate(book) {
-  const size = driveFileSize(book);
-  const sizeText = size ? ` (${formatBytes(size)})` : "";
+function showTooLargeGate(book, label, size) {
+  const title = label || book.title;
+  const bytes = size || driveFileSize(book);
+  const sizeText = bytes ? ` (${formatBytes(bytes)})` : "";
   const signIn = driveConfigured()
     ? '<button class="button primary" type="button" data-action="google-signin">Sign in with Google to open it here</button>'
     : "";
-  showDriveMessage(book, `toobig:${book.id}`, "Too large for Google's preview",
-    `<em>${escapeHtml(book.title)}</em>${escapeHtml(sizeText)} is past the size Drive's own viewer will display, so it cannot be shown in a Drive frame. Signing in lets the reader fetch the file directly and open it here instead.`,
+  showDriveMessage(book, `toobig:${book.id}:${title}`, "Too large for Google's preview",
+    `<em>${escapeHtml(title)}</em>${escapeHtml(sizeText)} is past the size Drive's own viewer will display, so it cannot be shown in a Drive frame. Signing in lets the reader fetch the file directly and open it here instead.`,
     signIn + driveLinkButton(book, "Download from Drive"));
 }
 
@@ -1007,13 +1008,21 @@ function showEmbed(book, page, restricted) {
 function showFolderItem(book, item) {
   const preview = item.previewUrl || driveEmbedUrl(item.url);
   const fileId = item.fileId || "";
+  const size = Number(item.size || 0);
+  const tooLarge = size > DRIVE_PREVIEW_LIMIT;
 
-  // Folder listings carry no file sizes, so an oversized child cannot be
-  // spotted in advance the way a catalogued book can — it has to be offered
-  // the same way out after Drive declines to render it.
-  if (fileId && driveApiForced.has(fileId) && driveCanFetch(true)) {
-    openDriveFile(book, fileId, item.title, null, true);
-    return;
+  // Folder children carry their own size (the metadata sync resolves each one
+  // through the Drive API), so an oversized child skips Drive's viewer exactly
+  // as a catalogued book does instead of failing inside it first.
+  if (fileId && (tooLarge || driveApiForced.has(fileId))) {
+    if (driveCanFetch(true)) {
+      openDriveFile(book, fileId, item.title, null, true);
+      return;
+    }
+    if (tooLarge) {
+      showTooLargeGate(book, item.title, size);
+      return;
+    }
   }
 
   if (preview) {

@@ -40,6 +40,8 @@ MISSING_MARKERS = (
     "folder does not exist",
 )
 USER_AGENT = "Mozilla/5.0 (compatible; OpenBooksResourceSync/1.0)"
+# Sent so a website-restricted API key accepts these calls.
+API_REFERER = "https://sonali1701.github.io/"
 
 
 def request_with_retries(url: str, *, stream: bool = False):
@@ -210,6 +212,74 @@ def list_public_folder(folder_id: str) -> list[dict]:
     return output
 
 
+def api_key_from_config() -> str:
+    """Read googleApiKey out of config.js so the sync needs no extra setup."""
+    config = ROOT / "config.js"
+    if not config.exists():
+        return ""
+    match = re.search(
+        r"googleApiKey\s*:\s*[\"']([^\"']*)[\"']",
+        config.read_text(encoding="utf-8"),
+    )
+    return match.group(1) if match else ""
+
+
+def drive_file_size(file_id: str, api_key: str) -> int:
+    """Size of one public Drive file, or 0 when it cannot be determined."""
+    url = (
+        "https://www.googleapis.com/drive/v3/files/"
+        f"{file_id}?fields=size&supportsAllDrives=true&key={api_key}"
+    )
+    try:
+        response = requests.get(
+            url,
+            timeout=(8, 30),
+            # A website-restricted key is refused without a matching referer.
+            headers={"User-Agent": USER_AGENT, "Referer": API_REFERER},
+        )
+        if response.status_code != 200:
+            return 0
+        return int(response.json().get("size") or 0)
+    except (requests.RequestException, ValueError):
+        return 0
+
+
+def resolve_folder_item_sizes(folder_audits: dict, api_key: str) -> int:
+    """Attach a size to every public folder PDF.
+
+    gdown lists folder children but reports no sizes, and without one the app
+    cannot tell that a child is past the size Drive's viewer will render — it
+    would only find out by failing inside Google's frame, which a cross-origin
+    page cannot even detect.
+    """
+    targets = {}
+    for metadata in folder_audits.values():
+        for item in metadata.get("folderItems") or []:
+            if item.get("kind") == "pdf" and item.get("fileId"):
+                targets.setdefault(item["fileId"], []).append(item)
+    if not targets:
+        return 0
+
+    sizes = {}
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        futures = {
+            pool.submit(drive_file_size, file_id, api_key): file_id
+            for file_id in targets
+        }
+        for future in as_completed(futures):
+            sizes[futures[future]] = future.result()
+
+    resolved = 0
+    for file_id, items in targets.items():
+        size = sizes.get(file_id, 0)
+        if not size:
+            continue
+        for item in items:
+            item["size"] = size
+        resolved += 1
+    return resolved
+
+
 def audit_external(url: str) -> dict:
     response, error = request_with_retries(url)
     access = classify_page(response)
@@ -369,6 +439,17 @@ def main():
         action="store_true",
         help="Reuse an existing output file instead of rechecking links/folders.",
     )
+    parser.add_argument(
+        "--api-key",
+        default="",
+        help="Google API key for sizing public folder children "
+             "(defaults to googleApiKey in config.js).",
+    )
+    parser.add_argument(
+        "--skip-folder-sizes",
+        action="store_true",
+        help="Do not resolve folder child sizes.",
+    )
     args = parser.parse_args()
 
     books = json.loads(BOOKS_PATH.read_text(encoding="utf-8"))
@@ -463,6 +544,18 @@ def main():
                     metadata["chapterError"] = error
                 else:
                     metadata["chapterError"] = "PDF has no embedded bookmarks"
+
+    if not args.skip_folder_sizes:
+        api_key = args.api_key or api_key_from_config()
+        if api_key:
+            resolved = resolve_folder_item_sizes(folder_audits, api_key)
+            print(f"Sized {resolved} public folder PDFs", flush=True)
+        else:
+            print(
+                "No API key: folder child sizes were not resolved, so the app "
+                "cannot pre-empt Drive's preview limit for them.",
+                flush=True,
+            )
 
     for metadata in file_audits.values():
         normalise_chapters(metadata)

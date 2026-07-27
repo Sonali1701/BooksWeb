@@ -98,11 +98,27 @@ reports failure back to us. So every Drive preview carries an **Open it here ins
 that switches that file to the API route for the session — the reader never has to wait for
 the app to notice something went wrong.
 
-That link matters most inside **public folders**. Folder listings come from `gdown` and carry
-no file sizes at all, so an oversized child cannot be spotted in advance the way a catalogued
-book can; the escape hatch is the only route for the 659 files listed across 43 public folders.
 The choice is recorded per *file*, not per catalog entry, since one folder holds many files and
 usually only one of them is the problem.
+
+**Public folder children are sized too.** `gdown` lists a folder's contents but reports no
+sizes, which once left those files as the only ones that had to fail inside Google's frame
+before anything could be done — and a cross-origin frame never reports that failure back, so
+the app could not even notice. The sync now resolves each child through the Drive API, so all
+655 public folder PDFs carry a size and the four over 100 MB skip Drive's viewer like any
+other oversized book:
+
+| Folder child | Size |
+| ------------ | ---- |
+| `Zoology11.pdf` (Aakash, Zoology 11) | 299 MB |
+| `Botany.pdf` (Aakash, Botany 11) | 210 MB |
+| `Botany12.pdf` (Aakash, Botany 12) | 171 MB |
+| `Physics -2(Allen).pdf` (Allen SRG) | 104 MB |
+
+Sizing runs automatically as part of `sync_resource_metadata.py`, reading the key from
+`config.js`; pass `--api-key` to override it or `--skip-folder-sizes` to leave sizes alone.
+Without a key the step is skipped with a warning, and those four books regress to failing
+inside Drive's viewer.
 
 Files over 250 MB additionally warn before downloading: they are held in memory to be
 displayed, which a phone or an older machine may not manage.
