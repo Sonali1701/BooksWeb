@@ -1252,6 +1252,9 @@ function startGoogleSignIn(mode) {
   setAuthBusy(true);
   window.OpenBooksDrive.signIn(mode)
     .catch((error) => {
+      // Deliberately narrow: only a cancellation by someone who has signed in
+      // before is silent. A first-attempt failure is far more likely to be
+      // configuration than a change of mind, so it gets explained.
       if (error && error.code === "cancelled") return;
       showAuthProblem(error);
     })

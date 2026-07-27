@@ -114,19 +114,30 @@
     return gisPromise;
   }
 
-  // Google reports an unlisted origin only through this generic code, so the
-  // message names the likely cause rather than echoing an opaque string.
+  function originHelp() {
+    return `Google Cloud Console → APIs & Services → Credentials → your OAuth client → ` +
+      `Authorized JavaScript origins must list exactly "${location.origin}" ` +
+      "(no path, no trailing slash).";
+  }
+
+  // An unlisted origin is rejected inside Google's own popup, which then just
+  // reports itself as closed — indistinguishable from the visitor giving up.
+  // Before any successful sign-in that is overwhelmingly the real cause, so
+  // the first failure names it instead of shrugging.
   function describe(response) {
     const code = String((response && (response.type || response.error)) || "");
     if (/popup_closed|popup_failed_to_open|user_cancel|access_denied/i.test(code)) {
+      if (!wasSignedIn()) {
+        return failure(
+          "cancelled_first",
+          "Sign-in did not complete. If Google showed \"Error 400: origin_mismatch\", " +
+          `this site is not yet authorised for that OAuth client. ${originHelp()}`
+        );
+      }
       return failure("cancelled", "Sign-in was cancelled.");
     }
     if (/idpiframe|origin|invalid_client|unauthorized/i.test(code)) {
-      return failure(
-        "origin",
-        `This site's address (${location.origin}) is not listed under the Google client's ` +
-        "Authorized JavaScript origins, so Google refused the sign-in."
-      );
+      return failure("origin", `Google refused the sign-in for this site. ${originHelp()}`);
     }
     return failure("auth", `Google sign-in failed (${code || "unknown error"}).`);
   }
