@@ -36,7 +36,10 @@
       <a href="#books">Materials</a>
     </nav>
 
-    <button id="installBtn" class="install-btn" type="button" hidden>&#11015; <span>Install app</span></button>
+    <div class="topbar-actions">
+      <button id="googleAuthBtn" class="auth-btn" type="button" hidden>Sign in with Google</button>
+      <button id="installBtn" class="install-btn" type="button" hidden>&#11015; <span>Install app</span></button>
+    </div>
   </header>
 
   <div id="iosHint" class="ios-hint" hidden>
@@ -175,6 +178,7 @@
   </nav>
 
   <script src="config.js"></script>
+  <script src="google-drive.js"></script>
   <script src="app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {

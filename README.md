@@ -64,7 +64,55 @@ checks every link anonymously. It does not mean *you* cannot open it. Drive's `/
 iframe uses the browser's own Google session, so a reader signed in to an account that has
 access sees the document in place.
 
-Restricted single files therefore open a sign-in gate rather than a dead end:
+#### Signing in with Google (recommended)
+
+When [`config.js`](config.js) carries a `googleClientId`, the reader signs in through Google
+Identity Services and reads files with the Drive API. This is the reliable route: a bearer
+token is not a cookie, so it works in Safari and Firefox, where Drive's own preview frame
+usually fails.
+
+Once signed in, **Drive becomes the source of truth** and the static audit is ignored for
+single files. That includes entries marked `Missing`, because Drive answers `404` both for a
+deleted file and for one the caller simply may not see — an anonymous probe cannot tell those
+apart, and a signed-in call can.
+
+The reader then:
+
+1. asks Drive whether the account can open the file, and says who it is signed in as when the
+   answer is no, offering **Request access** and **Use a different account**;
+2. downloads files under 25 MB straight into the page and shows them from a `blob:` URL —
+   the document is never framed from Google's origin;
+3. for anything larger, shows the size and waits for a tap, since these books run to hundreds
+   of megabytes and readers are often on phones;
+4. holds exactly one downloaded file at a time, releasing the previous object URL.
+
+The access token is kept in memory only, never in storage. A returning reader is re-authorised
+silently where the browser permits it, and simply sees the sign-in button where it does not.
+
+##### Setup this needs in Google Cloud
+
+The client ID alone is not enough — Google matches the requesting origin against an allow
+list, so **sign-in fails until every origin the app is served from is registered**:
+
+1. Open **Google Cloud Console → APIs & Services → Credentials**, pick the OAuth 2.0 Client
+   ID (type *Web application*), and under **Authorized JavaScript origins** add:
+   - `https://YOUR_USER.github.io` — origin only, no repository path
+   - `http://localhost:8000` — and any other port used locally
+2. Enable the **Google Drive API** for the project under **APIs & Services → Library**.
+3. On the **OAuth consent screen**, add every reader as a **Test user** while the app is in
+   *Testing* (capped at 100), or publish it.
+
+`drive.readonly` is a **restricted** scope. In *Testing* it works immediately for listed test
+users; publishing it to the general public requires Google's verification and a third-party
+security assessment. For a class or a small team, Testing mode is usually the right answer.
+
+The client ID is public by design and belongs in `config.js`. **The client secret does not** —
+the browser flow never uses it, and this repository is public. Keep the downloaded
+`client_secret_*.json` outside the repository.
+
+#### Without a client ID
+
+Restricted single files fall back to a sign-in gate around Drive's own preview:
 
 1. **Sign in / open in Drive** opens the file in a new tab, where Google handles signing in
    or requesting access.
@@ -76,13 +124,12 @@ Restricted single files therefore open a sign-in gate rather than a dead end:
 That second button records the reader's own assertion, not a verified session: a
 cross-origin iframe cannot report back whether it rendered, so the app cannot detect the
 difference between a loaded document and a Google sign-in screen. The escape hatch is what
-covers the gap.
+covers the gap. This is exactly the guesswork the signed-in route above removes.
 
-**Browser caveat:** the preview relies on Google cookies inside a third-party frame. Chrome
-and Edge generally allow this; Safari's tracking prevention and Firefox's Total Cookie
-Protection often do not, and will show Google's sign-in screen inside the frame instead. In
-those browsers, **Open in Drive** is the reliable route. Public files are unaffected — they
-need no session at all.
+**Browser caveat for this fallback:** it relies on Google cookies inside a third-party frame.
+Chrome and Edge generally allow this; Safari's tracking prevention and Firefox's Total Cookie
+Protection often do not, and will show Google's sign-in screen inside the frame instead.
+Public files are unaffected — they need no session at all.
 
 Restricted *folders* still cannot be embedded at any permission level, so they keep a panel
 pointing at Drive.

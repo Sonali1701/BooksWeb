@@ -5,6 +5,8 @@ const APP_CONFIG = window.OPEN_BOOKS_CONFIG || {};
 const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, "");
 const MOBILE_QUERY = "(max-width: 900px)";
 const DRIVE_SIGNIN_KEY = "obl:drive-signin";
+// Anything larger is downloaded only when the reader explicitly asks.
+const DRIVE_AUTOLOAD_LIMIT = 25 * 1024 * 1024;
 
 const fallbackBooks = [
   {
@@ -37,6 +39,7 @@ let currentViewKey = null;
 let resourceSummary = null;
 let chapterMap = null;
 let drivePreviewFallback = false; // used only when localStorage is unavailable
+let activeDriveFile = null; // { fileId, url } — the one blob URL held at a time
 
 // Books flagged localOnly (large local demo files) only render when running locally.
 const IS_LOCAL = ["localhost", "127.0.0.1", ""].includes(location.hostname);
@@ -75,6 +78,7 @@ const topbar = document.querySelector("#topbar");
 const tabbar = document.querySelector("#tabbar");
 const tabs = Array.from(document.querySelectorAll(".tab"));
 const backToLibrary = document.querySelector("#backToLibrary");
+const googleAuthBtn = document.querySelector("#googleAuthBtn");
 const sheetClose = document.querySelector("#sheetClose");
 const sheetScrim = document.querySelector("#sheetScrim");
 
@@ -462,6 +466,8 @@ function renderBooks() {
 
 function selectBook(book) {
   const collection = readerCollection(book);
+  // Free a held Drive download as soon as the reader moves to another file.
+  if (activeDriveFile && activeDriveFile.fileId !== driveFileId(book)) releaseDriveFile();
   selectedBook = book;
   // Reference outlines open on the whole document; real chapters open on the first one.
   selectedChapterIndex = collection.navigable && collection.items.length ? 0 : null;
@@ -676,10 +682,61 @@ function setDrivePreviewEnabled(enabled) {
   } catch (e) { /* storage unavailable — the in-memory flag still applies */ }
 }
 
+function driveFileId(book) {
+  const resource = book.resource || {};
+  if (resource.kind === "drive-file" && resource.fileId) return resource.fileId;
+  const match = String(book.sourceUrl || "").match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
+  return match ? match[1] : "";
+}
+
+// Anything Drive holds as a single file and the anonymous audit could not
+// read. "missing" is included deliberately: Drive answers 404 for some files
+// a signed-out visitor merely lacks permission to see, so the audit cannot
+// tell a deleted file from a private one. A signed-in API call can.
+function needsGoogleAuth(book) {
+  const resource = book.resource || {};
+  if (resource.access === "public") return false;
+  if (resource.kind && resource.kind !== "drive-file") return false;
+  return Boolean(driveFileId(book));
+}
+
+function driveConfigured() {
+  return Boolean(window.OpenBooksDrive && window.OpenBooksDrive.isConfigured());
+}
+
+function driveSignedIn() {
+  return driveConfigured() && window.OpenBooksDrive.isSignedIn();
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return "";
+  const mb = bytes / (1024 * 1024);
+  if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
+  return mb >= 1 ? `${Math.round(mb)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 // Offered before embedding so a restricted file never renders as a bare
 // Google error frame with no way forward.
 function showSignInGate(book) {
-  renderFrame(`signin:${book.id}`, `
+  const driveButton = book.sourceUrl
+    ? `<a class="button secondary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">Open in Drive instead</a>`
+    : "";
+
+  if (driveConfigured()) {
+    renderFrame(`signin:${book.id}`, `
+      <div class="pdf-placeholder pdf-gate">
+        <strong>Sign in to open this material</strong>
+        <p><em>${escapeHtml(book.title)}</em> is shared with specific Google accounts. Sign in with an account that has access and it opens right here — this route works even in browsers that block Drive's own preview frame.</p>
+        <div class="gate-actions">
+          <button class="button primary" type="button" data-action="google-signin">Sign in with Google</button>
+          ${driveButton}
+        </div>
+      </div>`);
+    return;
+  }
+
+  // No client ID configured — fall back to Drive's cookie-based preview.
+  renderFrame(`signin-basic:${book.id}`, `
     <div class="pdf-placeholder pdf-gate">
       <strong>Sign in to preview this material</strong>
       <p><em>${escapeHtml(book.title)}</em> is shared with specific Google accounts. Open it in Drive once to sign in (or to request access), then come back and the preview loads right here.</p>
@@ -688,6 +745,158 @@ function showSignInGate(book) {
         <button class="button secondary" type="button" data-action="enable-drive-preview">I am signed in — show the preview</button>
       </div>
     </div>`);
+}
+
+function showDriveMessage(book, key, heading, message, actions) {
+  renderFrame(`${key}:${book.id}`, `
+    <div class="pdf-placeholder pdf-gate">
+      <strong>${heading}</strong>
+      <p>${message}</p>
+      ${actions ? `<div class="gate-actions">${actions}</div>` : ""}
+    </div>`);
+}
+
+// Async work races the reader: a visitor can pick another book mid-download,
+// so every render checks it is still the newest request before painting.
+let driveRequestId = 0;
+
+function showAuthorisedDrive(book, page) {
+  const fileId = driveFileId(book);
+  const request = ++driveRequestId;
+  const current = selectedBook;
+
+  if (activeDriveFile && activeDriveFile.fileId === fileId) {
+    showBlobPdf(book, activeDriveFile.url, page);
+    return;
+  }
+
+  showDriveMessage(book, "drive-checking", "Checking your access…",
+    `Asking Google Drive whether this account can open <em>${escapeHtml(book.title)}</em>.`);
+
+  window.OpenBooksDrive.fileMeta(fileId).then((meta) => {
+    if (request !== driveRequestId || selectedBook !== current) return;
+
+    if (!meta.canDownload) {
+      showDriveMessage(book, "drive-nodownload", "This file is view-only",
+        "The owner has disabled downloading, so it cannot be opened here. Drive's own viewer can still show it.",
+        driveLinkButton(book, "Open in Drive"));
+      return;
+    }
+    if (meta.mimeType && meta.mimeType !== "application/pdf") {
+      showDriveMessage(book, "drive-notpdf", "Not a PDF",
+        `Drive reports this file as <code>${escapeHtml(meta.mimeType)}</code>, which the reader cannot display.`,
+        driveLinkButton(book, "Open in Drive"));
+      return;
+    }
+
+    // Large books are a real download on a phone, so they are never pulled
+    // without the reader asking for them.
+    if (meta.size && meta.size > DRIVE_AUTOLOAD_LIMIT) {
+      showDriveMessage(book, `drive-confirm-${fileId}`, "Ready to open",
+        `You have access to <em>${escapeHtml(meta.name || book.title)}</em>. It is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.`,
+        `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}">Open document (${escapeHtml(formatBytes(meta.size))})</button>` +
+        driveLinkButton(book, "Open in Drive instead"));
+      return;
+    }
+
+    loadDriveFile(book, fileId, page, meta);
+  }).catch((error) => {
+    if (request !== driveRequestId || selectedBook !== current) return;
+    showDriveError(book, error);
+  });
+}
+
+function driveLinkButton(book, label) {
+  return book.sourceUrl
+    ? `<a class="button secondary" href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`
+    : "";
+}
+
+function showDriveError(book, error) {
+  const code = error && error.code;
+  if (code === "signedout") {
+    showSignInGate(book);
+    return;
+  }
+  const account = driveAccountLabel();
+  if (code === "forbidden" || code === "notfound") {
+    showDriveMessage(book, `drive-${code}`, "No access with this account",
+      `${escapeHtml(error.message)}${account ? ` You are signed in as ${escapeHtml(account)}.` : ""} Open it in Drive to request access, or switch to an account that already has it.`,
+      driveLinkButton(book, "Request access in Drive") +
+      '<button class="button secondary" type="button" data-action="google-switch">Use a different account</button>');
+    return;
+  }
+  showDriveMessage(book, "drive-error", "Could not open this file",
+    escapeHtml((error && error.message) || "Google Drive did not respond."),
+    `<button class="button primary" type="button" data-action="drive-retry">Try again</button>` +
+    driveLinkButton(book, "Open in Drive"));
+}
+
+function driveAccountLabel() {
+  const user = driveConfigured() ? window.OpenBooksDrive.getUser() : null;
+  return user ? (user.email || user.name || "") : "";
+}
+
+function loadDriveFile(book, fileId, page, meta) {
+  const request = ++driveRequestId;
+  const current = selectedBook;
+  const total = (meta && meta.size) || 0;
+
+  showDriveMessage(book, `drive-loading-${fileId}`, "Opening…",
+    `<span id="driveProgress">Downloading ${escapeHtml(meta && meta.name ? meta.name : book.title)}${total ? ` (${escapeHtml(formatBytes(total))})` : ""}…</span>`);
+
+  const onProgress = (received, size) => {
+    if (request !== driveRequestId) return;
+    const label = document.querySelector("#driveProgress");
+    if (!label) return;
+    const cap = size || total;
+    label.textContent = cap
+      ? `Downloading… ${Math.round((received / cap) * 100)}% of ${formatBytes(cap)}`
+      : `Downloading… ${formatBytes(received)}`;
+  };
+
+  window.OpenBooksDrive.fileBlobUrl(fileId, onProgress).then((url) => {
+    if (request !== driveRequestId || selectedBook !== current) {
+      URL.revokeObjectURL(url); // a newer selection won this race
+      return;
+    }
+    releaseDriveFile();
+    activeDriveFile = { fileId, url };
+    showBlobPdf(book, url, page);
+  }).catch((error) => {
+    if (request !== driveRequestId || selectedBook !== current) return;
+    showDriveError(book, error);
+  });
+}
+
+// One blob at a time: these books run to hundreds of megabytes, so the
+// previous object URL is released before another is held.
+function releaseDriveFile() {
+  if (!activeDriveFile) return;
+  URL.revokeObjectURL(activeDriveFile.url);
+  activeDriveFile = null;
+}
+
+function showBlobPdf(book, url, page) {
+  const src = page ? `${url}#page=${page}` : `${url}#view=FitH`;
+  const key = `blob:${url}`;
+  const iframe = pdfFrame.querySelector("iframe.pdf-embed");
+  const account = driveAccountLabel();
+  const hint =
+    `Opened from Google Drive${account ? ` as ${escapeHtml(account)}` : ""}. ` +
+    `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">Open in a new tab</a>` +
+    (book.sourceUrl
+      ? ` &middot; <a href="${escapeHtml(book.sourceUrl)}" target="_blank" rel="noreferrer">View in Drive</a>`
+      : "");
+
+  if (currentViewKey === key && iframe) {
+    if (iframe.getAttribute("src") !== src) iframe.src = src;
+    return;
+  }
+  currentViewKey = key;
+  pdfFrame.innerHTML =
+    `<iframe class="pdf-embed" src="${escapeHtml(src)}" title="${escapeHtml(book.title)}"></iframe>` +
+    `<p class="pdf-hint">${hint}</p>`;
 }
 
 // Show an embeddable source (currently Google Drive preview) inline in the reader.
@@ -765,6 +974,11 @@ function wholeBookStatus(book, hasChapters) {
   if (bookPdfAvailable(book)) return hasChapters ? "Complete book" : book.pdf;
   if (book.localOnly) return "Local-only sample";
   if (isPublicDriveFile(book)) return "Displayed from Google Drive";
+  if (driveConfigured() && needsGoogleAuth(book)) {
+    const account = driveAccountLabel();
+    if (driveSignedIn()) return account ? `Google Drive · ${account}` : "Opened from Google Drive";
+    return "Sign in with Google to open this material";
+  }
   if (isRestrictedDriveFile(book)) {
     return drivePreviewEnabled()
       ? "Drive preview — needs a signed-in account with access"
@@ -780,7 +994,12 @@ function showWholeBook(book, page) {
   } else if (book.localOnly) {
     showLocalOnly(book);
   } else if (isPublicDriveFile(book)) {
+    // Public files need no session at all — the free iframe beats downloading.
     showEmbed(book, page);
+  } else if (driveSignedIn() && needsGoogleAuth(book)) {
+    showAuthorisedDrive(book, page);
+  } else if (driveConfigured() && needsGoogleAuth(book)) {
+    showSignInGate(book);
   } else if (isRestrictedDriveFile(book)) {
     if (drivePreviewEnabled()) showEmbed(book, page, true);
     else showSignInGate(book);
@@ -925,11 +1144,12 @@ function bindEvents() {
   pdfFrame.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-action]");
     if (!trigger) return;
-    const action = trigger.dataset.action;
-    if (action !== "enable-drive-preview" && action !== "reset-drive-preview") return;
-    setDrivePreviewEnabled(action === "enable-drive-preview");
-    currentViewKey = null; // force the viewer to swap between gate and preview
-    renderReaderView();
+    handleViewerAction(trigger.dataset.action, trigger);
+  });
+
+  googleAuthBtn.addEventListener("click", () => {
+    if (driveSignedIn()) startGoogleSignOut();
+    else startGoogleSignIn();
   });
 
   fullscreenBtn.addEventListener("click", () => {
@@ -993,6 +1213,104 @@ function bindEvents() {
   if (window.ResizeObserver && topbar) {
     new ResizeObserver(measureChrome).observe(topbar);
   }
+}
+
+/* ---------- Google sign-in ---------- */
+
+function handleViewerAction(action, trigger) {
+  if (action === "enable-drive-preview" || action === "reset-drive-preview") {
+    setDrivePreviewEnabled(action === "enable-drive-preview");
+    currentViewKey = null; // force the viewer to swap between gate and preview
+    renderReaderView();
+    return;
+  }
+  if (action === "google-signin" || action === "google-switch") {
+    startGoogleSignIn(action === "google-switch" ? "switch" : "");
+    return;
+  }
+  if (action === "drive-retry") {
+    currentViewKey = null;
+    renderReaderView();
+    return;
+  }
+  if (action === "drive-load" && selectedBook) {
+    loadDriveFile(selectedBook, trigger.dataset.file, currentChapterPage());
+  }
+}
+
+// The page anchor of whatever is selected, so a resumed download lands there.
+function currentChapterPage() {
+  if (!selectedBook || selectedChapterIndex === null) return null;
+  const collection = readerCollection(selectedBook);
+  if (collection.mode !== "chapters") return null;
+  const item = collection.items[selectedChapterIndex];
+  return item ? item.page || null : null;
+}
+
+function startGoogleSignIn(mode) {
+  if (!driveConfigured()) return;
+  setAuthBusy(true);
+  window.OpenBooksDrive.signIn(mode)
+    .catch((error) => {
+      if (error && error.code === "cancelled") return;
+      showAuthProblem(error);
+    })
+    .finally(() => setAuthBusy(false));
+}
+
+function startGoogleSignOut() {
+  window.OpenBooksDrive.signOut();
+  releaseDriveFile();
+}
+
+function setAuthBusy(busy) {
+  googleAuthBtn.disabled = busy;
+  if (busy) googleAuthBtn.textContent = "Signing in…";
+  else syncAuthButton();
+}
+
+function showAuthProblem(error) {
+  if (!selectedBook) return;
+  showDriveMessage(selectedBook, "auth-error", "Google sign-in did not complete",
+    escapeHtml((error && error.message) || "Sign-in failed."),
+    '<button class="button primary" type="button" data-action="google-signin">Try again</button>' +
+    driveLinkButton(selectedBook, "Open in Drive"));
+}
+
+function syncAuthButton() {
+  if (!driveConfigured()) {
+    googleAuthBtn.hidden = true;
+    return;
+  }
+  googleAuthBtn.hidden = false;
+  googleAuthBtn.disabled = false;
+  if (driveSignedIn()) {
+    const account = driveAccountLabel();
+    googleAuthBtn.textContent = account ? `Sign out (${account})` : "Sign out of Google";
+    googleAuthBtn.classList.add("signed-in");
+    googleAuthBtn.title = "Signed in to Google Drive";
+  } else {
+    googleAuthBtn.textContent = "Sign in with Google";
+    googleAuthBtn.classList.remove("signed-in");
+    googleAuthBtn.title = "Sign in to open Drive files shared with your account";
+  }
+  measureChrome();
+}
+
+function setupGoogleAuth() {
+  if (!driveConfigured()) {
+    googleAuthBtn.hidden = true;
+    return;
+  }
+  window.OpenBooksDrive.onChange(() => {
+    syncAuthButton();
+    currentViewKey = null; // access changed — re-resolve whatever is open
+    renderReaderView();
+  });
+  syncAuthButton();
+  // A returning reader is re-authorised without a prompt where the browser
+  // still allows it; if not, the sign-in button is simply left showing.
+  if (window.OpenBooksDrive.wasSignedIn()) window.OpenBooksDrive.restore();
 }
 
 function scrollActiveChapterIntoView() {
@@ -1135,6 +1453,7 @@ async function init() {
   setupFilters();
   bindEvents();
   setupInstall();
+  setupGoogleAuth();
   setView(isMobile() && initial ? "reader" : "library");
   if (isMobile()) filterPanel.open = false;
   syncLayout();

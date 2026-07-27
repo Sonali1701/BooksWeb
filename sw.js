@@ -1,11 +1,12 @@
 // Service worker for Open Books Library PWA.
 // Caches the app shell so it launches offline; lazily caches chapter PDFs after first view.
-const CACHE = "obl-v5";
+const CACHE = "obl-v6";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./config.js",
+  "./google-drive.js",
   "./app.js",
   "./books.json",
   "./resource-meta.json",

@@ -157,6 +157,50 @@ code {
   color: var(--green-dark);
 }
 
+.topbar-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.auth-btn {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-height: 38px;
+  max-width: 240px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-btn:hover {
+  border-color: var(--green);
+  color: var(--green-dark);
+}
+
+.auth-btn.signed-in {
+  color: var(--green-dark);
+  background: #e9f3ef;
+  border-color: #bcd6cb;
+}
+
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .install-btn {
   display: inline-flex;
   flex: none;
@@ -1297,6 +1341,12 @@ code {
 
   .install-btn {
     padding: 0 10px;
+  }
+
+  .auth-btn {
+    max-width: 120px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 
   .filters {

@@ -1,3 +1,7 @@
 .chrome-profile*/
 .edge-profile*/
 /NEET CONTENT TRACKER - Sheet1.csv
+# OAuth client secrets must never reach this public repository. Only the
+# client ID belongs in config.js; the browser flow never uses the secret.
+client_secret*.json
+*credentials*.json
