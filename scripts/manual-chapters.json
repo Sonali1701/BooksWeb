@@ -254,5 +254,82 @@
         "page": 728
       }
     ]
+  },
+  "es-270-chemistry-a-textbook-of-inorganic-chemis": {
+    "title": "GRB A Textbook of Inorganic Chemistry for JEE (2nd Year Programme)",
+    "offset": -12,
+    "offsetSamples": [
+      [
+        50,
+        38
+      ],
+      [
+        250,
+        238
+      ],
+      [
+        450,
+        438
+      ]
+    ],
+    "verified": "8/14 pages confirmed directly, spanning pdf 13 to 531; the offset held at every check, so no drift",
+    "chapters": [
+      {
+        "title": "Chapter 1: General Principles of Extraction of Metals",
+        "page": 13
+      },
+      {
+        "title": "Chapter 2: Environmental Chemistry",
+        "page": 47
+      },
+      {
+        "title": "Chapter 3: Elements of Group VIA or 16 (The Oxygen Family)",
+        "page": 90
+      },
+      {
+        "title": "Chapter 4: Elements of Group VIIA or 17 (The Halogen Family)",
+        "page": 138
+      },
+      {
+        "title": "Chapter 5: Elements of 18 or Zero Group (Noble Gases)",
+        "page": 191
+      },
+      {
+        "title": "Revision Exercise 1 (Chapters 1 to 5)",
+        "page": 215
+      },
+      {
+        "title": "Chapter 6: Transition Elements — d-Block and f-Block Elements",
+        "page": 221
+      },
+      {
+        "title": "Chapter 7: Coordination Compounds and Organometallics",
+        "page": 332
+      },
+      {
+        "title": "Revision Exercise 2 (Chapters 6 to 7)",
+        "page": 403
+      },
+      {
+        "title": "Chapter 8: Volumetric Analysis",
+        "page": 409
+      },
+      {
+        "title": "Chapter 9: Qualitative Inorganic Analysis",
+        "page": 451
+      },
+      {
+        "title": "Revision Exercise 3 (Chapters 8 to 9)",
+        "page": 489
+      },
+      {
+        "title": "Miscellaneous",
+        "page": 496
+      },
+      {
+        "title": "Practice Papers (with Solutions)",
+        "page": 531
+      }
+    ]
   }
 }

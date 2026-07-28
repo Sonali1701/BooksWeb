@@ -9016,182 +9016,77 @@
       "size": 72422270,
       "chapters": [
         {
-          "title": "Section 1",
-          "page": 1,
+          "title": "Chapter 1: General Principles of Extraction of Metals",
+          "page": 13,
           "unit": ""
         },
         {
-          "title": "Section 2",
-          "page": 20,
+          "title": "Chapter 2: Environmental Chemistry",
+          "page": 47,
           "unit": ""
         },
         {
-          "title": "Section 3",
-          "page": 37,
+          "title": "Chapter 3: Elements of Group VIA or 16 (The Oxygen Family)",
+          "page": 90,
           "unit": ""
         },
         {
-          "title": "Section 4",
-          "page": 56,
+          "title": "Chapter 4: Elements of Group VIIA or 17 (The Halogen Family)",
+          "page": 138,
           "unit": ""
         },
         {
-          "title": "Section 5",
-          "page": 72,
+          "title": "Chapter 5: Elements of 18 or Zero Group (Noble Gases)",
+          "page": 191,
           "unit": ""
         },
         {
-          "title": "Section 6",
-          "page": 89,
-          "unit": ""
-        },
-        {
-          "title": "Section 7",
-          "page": 105,
-          "unit": ""
-        },
-        {
-          "title": "Section 8",
-          "page": 120,
-          "unit": ""
-        },
-        {
-          "title": "Section 9",
-          "page": 136,
-          "unit": ""
-        },
-        {
-          "title": "Section 10",
-          "page": 150,
-          "unit": ""
-        },
-        {
-          "title": "Section 11",
-          "page": 166,
-          "unit": ""
-        },
-        {
-          "title": "Section 12",
-          "page": 182,
-          "unit": ""
-        },
-        {
-          "title": "Section 13",
-          "page": 198,
-          "unit": ""
-        },
-        {
-          "title": "Section 14",
+          "title": "Revision Exercise 1 (Chapters 1 to 5)",
           "page": 215,
           "unit": ""
         },
         {
-          "title": "Section 15",
-          "page": 231,
+          "title": "Chapter 6: Transition Elements — d-Block and f-Block Elements",
+          "page": 221,
           "unit": ""
         },
         {
-          "title": "Section 16",
-          "page": 246,
+          "title": "Chapter 7: Coordination Compounds and Organometallics",
+          "page": 332,
           "unit": ""
         },
         {
-          "title": "Section 17",
-          "page": 261,
+          "title": "Revision Exercise 2 (Chapters 6 to 7)",
+          "page": 403,
           "unit": ""
         },
         {
-          "title": "Section 18",
-          "page": 271,
+          "title": "Chapter 8: Volumetric Analysis",
+          "page": 409,
           "unit": ""
         },
         {
-          "title": "Section 19",
-          "page": 286,
+          "title": "Chapter 9: Qualitative Inorganic Analysis",
+          "page": 451,
           "unit": ""
         },
         {
-          "title": "Section 20",
-          "page": 302,
+          "title": "Revision Exercise 3 (Chapters 8 to 9)",
+          "page": 489,
           "unit": ""
         },
         {
-          "title": "Section 21",
-          "page": 319,
+          "title": "Miscellaneous",
+          "page": 496,
           "unit": ""
         },
         {
-          "title": "Section 22",
-          "page": 336,
-          "unit": ""
-        },
-        {
-          "title": "Section 23",
-          "page": 351,
-          "unit": ""
-        },
-        {
-          "title": "Section 24",
-          "page": 365,
-          "unit": ""
-        },
-        {
-          "title": "Section 25",
-          "page": 381,
-          "unit": ""
-        },
-        {
-          "title": "Section 26",
-          "page": 397,
-          "unit": ""
-        },
-        {
-          "title": "Section 27",
-          "page": 414,
-          "unit": ""
-        },
-        {
-          "title": "Section 28",
-          "page": 430,
-          "unit": ""
-        },
-        {
-          "title": "Section 29",
-          "page": 446,
-          "unit": ""
-        },
-        {
-          "title": "Section 30",
-          "page": 449,
-          "unit": ""
-        },
-        {
-          "title": "Section 31",
-          "page": 465,
-          "unit": ""
-        },
-        {
-          "title": "Section 32",
-          "page": 481,
-          "unit": ""
-        },
-        {
-          "title": "Section 33",
-          "page": 499,
-          "unit": ""
-        },
-        {
-          "title": "Section 34",
-          "page": 516,
-          "unit": ""
-        },
-        {
-          "title": "Section 35",
-          "page": 534,
+          "title": "Practice Papers (with Solutions)",
+          "page": 531,
           "unit": ""
         }
       ],
-      "chapterSource": "page-divisions"
+      "chapterSource": "contents-page"
     },
     "es-271-chemistry-objective-chemistry-part-ii": {
       "kind": "drive-file",
