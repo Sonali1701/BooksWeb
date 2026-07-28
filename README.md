@@ -296,6 +296,48 @@ Each chapter can open in one of two ways:
 Public Google Drive PDFs with bookmarks are live examples of Mode A: the metadata sync
 extracts their section titles and starting pages without publishing copies of the books.
 
+### Extracting chapters from the PDFs
+
+[`scripts/extract_chapters.py`](scripts/extract_chapters.py) reads real chapter divisions out
+of the public PDFs. Every page number it produces is derived from the file, never guessed:
+
+```powershell
+py scripts/extract_chapters.py                 # report only, writes nothing
+py scripts/extract_chapters.py --write         # update resource-meta.json
+py scripts/extract_chapters.py --only hcv --show 8   # inspect one book
+py scripts/extract_chapters.py --tidy --write  # relabel scanner debris, no download
+```
+
+Three sources are tried in order:
+
+1. **Embedded bookmarks** — exact, and present even in scanned books. Titles are trusted only
+   when they read like chapter names; scanners often write the batch id (`0607_028`) into the
+   outline instead.
+2. **The printed contents page** — needs a text layer. Printed page numbers are not PDF page
+   indices, so the offset is measured from the page folios and applied only when enough pages
+   agree.
+3. **Page headings** — when the outline gives exact breaks under useless names, each division's
+   own heading is read off its page.
+
+Whatever comes out is then checked against the document: sample chapters, confirm the title's
+words really appear at the computed page, and discard the list below 60%. Three further guards
+exist because the first run produced convincing rubbish — entries like `247 -262`, `?96` and
+`(ix)`, scraped from an exam archive and a marks scheme, which *passed* verification because a
+two-character fragment appears on almost any page:
+
+- titles must look like titles (not page ranges, folio markers, or OCR noise);
+- a printed contents list must span at least 30% of the book, since a cluster covering 153 of
+  999 pages is a stray table, not the contents;
+- an entry with nothing distinctive to match on counts as unverified, not as a pass.
+
+A wrong jump is worse than no chapters, because it looks like a working feature. Anything
+uncertain is dropped, and the book keeps its fuller syllabus outline instead. Re-running clears
+lists this script previously wrote and now rejects.
+
+**Current yield across the 32 public books:** 19 have chapters — 10 with real titles (Halliday
+47, HCV 43, Zoology 50, Pathfinder 16 being the fullest), 9 with page divisions only. The
+remaining books are scans with no text layer, where no parser can help.
+
 ### Where a book's contents come from
 
 Every entry gets a table of contents when one can be established. The reader resolves it in

@@ -2988,7 +2988,219 @@
       "contentType": "application/octet-stream",
       "filename": "4. HCV Concept of Physics Volume-2.pdf",
       "size": 18425602,
-      "chapterError": "PDF has no embedded bookmarks"
+      "chapters": [
+        {
+          "title": "Heat and Temperature",
+          "page": 17,
+          "unit": ""
+        },
+        {
+          "title": "Pressure Thermometer",
+          "page": 21,
+          "unit": ""
+        },
+        {
+          "title": "Kinetic Theory of Gases",
+          "page": 31,
+          "unit": ""
+        },
+        {
+          "title": "Vapour Pressure",
+          "page": 38,
+          "unit": ""
+        },
+        {
+          "title": "Calorimetry",
+          "page": 55,
+          "unit": ""
+        },
+        {
+          "title": "in Laboratory",
+          "page": 56,
+          "unit": ""
+        },
+        {
+          "title": "Fusion of Ice",
+          "page": 57,
+          "unit": ""
+        },
+        {
+          "title": "Vaporization of Water",
+          "page": 58,
+          "unit": ""
+        },
+        {
+          "title": "Laws of Thermodynamics",
+          "page": 65,
+          "unit": ""
+        },
+        {
+          "title": "Specific Heat Capacities of Gases",
+          "page": 81,
+          "unit": ""
+        },
+        {
+          "title": "a Reversible Adiabatic Process",
+          "page": 85,
+          "unit": ""
+        },
+        {
+          "title": "Heat Transfer",
+          "page": 97,
+          "unit": ""
+        },
+        {
+          "title": "Electric Field and Potential",
+          "page": 120,
+          "unit": ""
+        },
+        {
+          "title": "in an Electric Field",
+          "page": 128,
+          "unit": ""
+        },
+        {
+          "title": "Gauss’s Law",
+          "page": 143,
+          "unit": ""
+        },
+        {
+          "title": "from Coulomb’s Law",
+          "page": 145,
+          "unit": ""
+        },
+        {
+          "title": "Capacitors",
+          "page": 160,
+          "unit": ""
+        },
+        {
+          "title": "Energy Density in Electric Field",
+          "page": 166,
+          "unit": ""
+        },
+        {
+          "title": "Placed in an Infinite Dielectric",
+          "page": 170,
+          "unit": ""
+        },
+        {
+          "title": "Electric Current In Conductors",
+          "page": 188,
+          "unit": ""
+        },
+        {
+          "title": "Current",
+          "page": 222,
+          "unit": ""
+        },
+        {
+          "title": "and Thomson Effects",
+          "page": 226,
+          "unit": ""
+        },
+        {
+          "title": "Magnetic Field",
+          "page": 237,
+          "unit": ""
+        },
+        {
+          "title": "in a Uniform Magnetic Field",
+          "page": 238,
+          "unit": ""
+        },
+        {
+          "title": "Magnetic Field due to a Current",
+          "page": 253,
+          "unit": ""
+        },
+        {
+          "title": "due to a Long, Straight Current",
+          "page": 257,
+          "unit": ""
+        },
+        {
+          "title": "Permanent Magnets",
+          "page": 271,
+          "unit": ""
+        },
+        {
+          "title": "Placed in a Magnetic Field",
+          "page": 273,
+          "unit": ""
+        },
+        {
+          "title": "Magnetic Properties of Matter",
+          "page": 295,
+          "unit": ""
+        },
+        {
+          "title": "Diamagnetism",
+          "page": 296,
+          "unit": ""
+        },
+        {
+          "title": "Ferromagnetic Substances",
+          "page": 298,
+          "unit": ""
+        },
+        {
+          "title": "Electromagnetic Induction",
+          "page": 304,
+          "unit": ""
+        },
+        {
+          "title": "Alternating Current",
+          "page": 332,
+          "unit": ""
+        },
+        {
+          "title": "in an AC Circuit",
+          "page": 336,
+          "unit": ""
+        },
+        {
+          "title": "Electromagnetic Waves",
+          "page": 348,
+          "unit": ""
+        },
+        {
+          "title": "Plane Electromagnetic Waves",
+          "page": 350,
+          "unit": ""
+        },
+        {
+          "title": "Radiation in Atmosphere",
+          "page": 352,
+          "unit": ""
+        },
+        {
+          "title": "Electric Current through Gases",
+          "page": 357,
+          "unit": ""
+        },
+        {
+          "title": "Photoelectric Effect and Wave–Particle Duality",
+          "page": 371,
+          "unit": ""
+        },
+        {
+          "title": "Bohr’s Model and Physics of the Atom",
+          "page": 384,
+          "unit": ""
+        },
+        {
+          "title": "Semiconductors and Semiconductor Devices",
+          "page": 413,
+          "unit": ""
+        },
+        {
+          "title": "The Nucleus",
+          "page": 438,
+          "unit": ""
+        }
+      ],
+      "chapterSource": "printed-toc"
     },
     "es-61-maths-mathematics-mcq": {
       "kind": "drive-file",
@@ -3015,8 +3227,7 @@
       "downloadUrl": "https://drive.usercontent.google.com/download?id=1YIfYcnzbZ1qUZwM5Tj2Q896WJQ3GqPYc&export=download&authuser=0&confirm=t",
       "contentType": "application/octet-stream",
       "filename": "Mathenatics For Class 12 (R S Aggarwal).pdf",
-      "size": 193705110,
-      "chapterError": "PDF has no embedded bookmarks"
+      "size": 193705110
     },
     "es-64-chemistry-cengage": {
       "kind": "drive-file",
@@ -4088,8 +4299,7 @@
       "downloadUrl": "https://drive.usercontent.google.com/download?id=1IsZpWGcqrBme9E6Tm0-xoq0JuKFOD7n1&export=download&authuser=0&confirm=t",
       "contentType": "application/octet-stream",
       "filename": "MTG Fingertips_NEET_Volume 1(XI) and Volume 2(XII)_Physics.pdf",
-      "size": 345783380,
-      "chapterError": "Skipped: file exceeds 200 MB"
+      "size": 345783380
     },
     "es-123-physics-ncert-fingertips": {
       "kind": "drive-file",
@@ -4099,8 +4309,7 @@
       "downloadUrl": "https://drive.usercontent.google.com/download?id=1IsZpWGcqrBme9E6Tm0-xoq0JuKFOD7n1&export=download&authuser=0&confirm=t",
       "contentType": "application/octet-stream",
       "filename": "MTG Fingertips_NEET_Volume 1(XI) and Volume 2(XII)_Physics.pdf",
-      "size": 345783380,
-      "chapterError": "Skipped: file exceeds 200 MB"
+      "size": 345783380
     },
     "es-124-biology-100-percent": {
       "kind": "drive-file",
@@ -6980,96 +7189,32 @@
       "size": 8660383,
       "chapters": [
         {
-          "title": "Section 1",
-          "page": 1,
-          "unit": ""
-        },
-        {
-          "title": "Section 2",
+          "title": "STRAIGHT LINE",
           "page": 4,
           "unit": ""
         },
         {
-          "title": "Section 3",
-          "page": 11,
-          "unit": ""
-        },
-        {
-          "title": "Section 4",
-          "page": 43,
-          "unit": ""
-        },
-        {
-          "title": "Section 5",
-          "page": 67,
-          "unit": ""
-        },
-        {
-          "title": "Section 6",
+          "title": "CIRCLE",
           "page": 79,
           "unit": ""
         },
         {
-          "title": "Section 7",
-          "page": 85,
-          "unit": ""
-        },
-        {
-          "title": "Section 8",
-          "page": 123,
-          "unit": ""
-        },
-        {
-          "title": "Section 9",
-          "page": 147,
-          "unit": ""
-        },
-        {
-          "title": "Section 10",
+          "title": "PARABOLA",
           "page": 158,
           "unit": ""
         },
         {
-          "title": "Section 11",
-          "page": 164,
-          "unit": ""
-        },
-        {
-          "title": "Section 12",
-          "page": 189,
-          "unit": ""
-        },
-        {
-          "title": "Section 13",
+          "title": "ELLIPSE",
           "page": 216,
           "unit": ""
         },
         {
-          "title": "Section 14",
-          "page": 221,
-          "unit": ""
-        },
-        {
-          "title": "Section 15",
-          "page": 240,
-          "unit": ""
-        },
-        {
-          "title": "Section 16",
+          "title": "HYPERBOLA",
           "page": 264,
           "unit": ""
-        },
-        {
-          "title": "Section 17",
-          "page": 271,
-          "unit": ""
-        },
-        {
-          "title": "Section 18",
-          "page": 288,
-          "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-headings"
     },
     "es-156-maths-advanced-problem-in-mathematics": {
       "kind": "drive-file",
@@ -7822,47 +7967,47 @@
           "unit": "Sections"
         },
         {
-          "title": "0378_001 (1)",
+          "title": "Section 37",
           "page": 770,
           "unit": "Sections"
         },
         {
-          "title": "0378_026 (1)",
+          "title": "Section 38",
           "page": 795,
           "unit": "Sections"
         },
         {
-          "title": "0378_048 (1)",
+          "title": "Section 39",
           "page": 817,
           "unit": "Sections"
         },
         {
-          "title": "0378_070 (1)",
+          "title": "Section 40",
           "page": 839,
           "unit": "Sections"
         },
         {
-          "title": "0378_091 (1)",
+          "title": "Section 41",
           "page": 860,
           "unit": "Sections"
         },
         {
-          "title": "0378_113 (1)",
+          "title": "Section 42",
           "page": 882,
           "unit": "Sections"
         },
         {
-          "title": "0378_134 (1)",
+          "title": "Section 43",
           "page": 903,
           "unit": "Sections"
         },
         {
-          "title": "0378_156 (1)",
+          "title": "Section 44",
           "page": 925,
           "unit": "Sections"
         },
         {
-          "title": "0378_178 (1)",
+          "title": "Section 45",
           "page": 947,
           "unit": "Sections"
         },
@@ -8087,7 +8232,8 @@
           "page": 490,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-255-chemistry-madhyamik-rasyan-vigyan-bhag-1": {
       "kind": "drive-file",
@@ -8427,7 +8573,8 @@
           "page": 1425,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "bookmarks"
     },
     "es-263-physics-pathfinder-for-olympiad-and-jee-": {
       "kind": "drive-file",
@@ -8519,7 +8666,8 @@
           "page": 364,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "bookmarks"
     },
     "es-264-biology-neet-exploring-biology-vol-2": {
       "kind": "drive-file",
@@ -8563,200 +8711,171 @@
         },
         {
           "title": "Section 7",
-          "page": 77,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 8",
-          "page": 95,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 9",
-          "page": 115,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 10",
-          "page": 135,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 11",
-          "page": 154,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 12",
-          "page": 175,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 13",
           "page": 184,
           "unit": ""
         },
         {
-          "title": "Section 14",
+          "title": "Section 8",
           "page": 205,
           "unit": ""
         },
         {
-          "title": "Section 15",
+          "title": "Section 9",
           "page": 224,
           "unit": ""
         },
         {
-          "title": "Section 16",
+          "title": "Section 10",
           "page": 243,
           "unit": ""
         },
         {
-          "title": "Section 17",
+          "title": "Section 11",
           "page": 263,
           "unit": ""
         },
         {
-          "title": "Section 18",
+          "title": "Section 12",
           "page": 282,
           "unit": ""
         },
         {
-          "title": "Section 19",
+          "title": "Section 13",
           "page": 302,
           "unit": ""
         },
         {
-          "title": "Section 20",
+          "title": "Section 14",
           "page": 322,
           "unit": ""
         },
         {
-          "title": "Section 21",
+          "title": "Section 15",
           "page": 338,
           "unit": ""
         },
         {
-          "title": "Section 22",
+          "title": "Section 16",
           "page": 359,
           "unit": ""
         },
         {
-          "title": "Section 23",
+          "title": "Section 17",
           "page": 379,
           "unit": ""
         },
         {
-          "title": "Section 24",
+          "title": "Section 18",
           "page": 398,
           "unit": ""
         },
         {
-          "title": "Section 25",
+          "title": "Section 19",
           "page": 419,
           "unit": ""
         },
         {
-          "title": "Section 26",
+          "title": "Section 20",
           "page": 438,
           "unit": ""
         },
         {
-          "title": "Section 27",
+          "title": "Section 21",
           "page": 459,
           "unit": ""
         },
         {
-          "title": "Section 28",
+          "title": "Section 22",
           "page": 479,
           "unit": ""
         },
         {
-          "title": "Section 29",
+          "title": "Section 23",
           "page": 498,
           "unit": ""
         },
         {
-          "title": "Section 30",
+          "title": "Section 24",
           "page": 518,
           "unit": ""
         },
         {
-          "title": "Section 31",
+          "title": "Section 25",
           "page": 537,
           "unit": ""
         },
         {
-          "title": "Section 32",
+          "title": "Section 26",
           "page": 558,
           "unit": ""
         },
         {
-          "title": "Section 33",
+          "title": "Section 27",
           "page": 576,
           "unit": ""
         },
         {
-          "title": "Section 34",
+          "title": "Section 28",
           "page": 596,
           "unit": ""
         },
         {
-          "title": "Section 35",
+          "title": "Section 29",
           "page": 616,
           "unit": ""
         },
         {
-          "title": "Section 36",
+          "title": "Section 30",
           "page": 635,
           "unit": ""
         },
         {
-          "title": "Section 37",
+          "title": "Section 31",
           "page": 655,
           "unit": ""
         },
         {
-          "title": "Section 38",
+          "title": "Section 32",
           "page": 673,
           "unit": ""
         },
         {
-          "title": "Section 39",
+          "title": "Section 33",
           "page": 692,
           "unit": ""
         },
         {
-          "title": "Section 40",
+          "title": "Section 34",
           "page": 712,
           "unit": ""
         },
         {
-          "title": "Section 41",
+          "title": "Section 35",
           "page": 731,
           "unit": ""
         },
         {
-          "title": "Section 42",
+          "title": "Section 36",
           "page": 749,
           "unit": ""
         },
         {
-          "title": "Section 43",
+          "title": "Section 37",
           "page": 767,
           "unit": ""
         },
         {
-          "title": "Section 44",
+          "title": "Section 38",
           "page": 786,
           "unit": ""
         },
         {
-          "title": "Section 45",
+          "title": "Section 39",
           "page": 805,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-265-biology-parbodh-jeev-vigyan": {
       "kind": "drive-file",
@@ -8805,7 +8924,8 @@
           "page": 637,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "bookmarks"
     },
     "es-267-biology-parbodh-jeev-vigyan": {
       "kind": "drive-file",
@@ -8832,7 +8952,8 @@
           "page": 705,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "bookmarks"
     },
     "es-268-physics-parbodh-bhoutiki-physics": {
       "kind": "drive-file",
@@ -8881,7 +9002,8 @@
           "page": 685,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "bookmarks"
     },
     "es-270-chemistry-a-textbook-of-inorganic-chemis": {
       "kind": "drive-file",
@@ -9068,7 +9190,8 @@
           "page": 534,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-271-chemistry-objective-chemistry-part-ii": {
       "kind": "drive-file",
@@ -9355,7 +9478,8 @@
           "page": 1136,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-272-maths-nootan-ganit": {
       "kind": "drive-file",
@@ -9487,7 +9611,8 @@
           "page": 581,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-273-chemistry-nootan-isc-chemistry-part-2": {
       "kind": "drive-file",
@@ -9526,155 +9651,141 @@
         },
         {
           "title": "Section 6",
-          "page": 51,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 7",
-          "page": 72,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 8",
-          "page": 91,
-          "unit": "Sections"
-        },
-        {
-          "title": "Section 9",
           "page": 97,
           "unit": ""
         },
         {
-          "title": "Section 10",
+          "title": "Section 7",
           "page": 115,
           "unit": ""
         },
         {
-          "title": "Section 11",
+          "title": "Section 8",
           "page": 133,
           "unit": ""
         },
         {
-          "title": "Section 12",
+          "title": "Section 9",
           "page": 153,
           "unit": ""
         },
         {
-          "title": "Section 13",
+          "title": "Section 10",
           "page": 165,
           "unit": ""
         },
         {
-          "title": "Section 14",
+          "title": "Section 11",
           "page": 184,
           "unit": ""
         },
         {
-          "title": "Section 15",
+          "title": "Section 12",
           "page": 202,
           "unit": ""
         },
         {
-          "title": "Section 16",
+          "title": "Section 13",
           "page": 220,
           "unit": ""
         },
         {
-          "title": "Section 17",
+          "title": "Section 14",
           "page": 238,
           "unit": ""
         },
         {
-          "title": "Section 18",
+          "title": "Section 15",
           "page": 256,
           "unit": ""
         },
         {
-          "title": "Section 19",
+          "title": "Section 16",
           "page": 275,
           "unit": ""
         },
         {
-          "title": "Section 20",
+          "title": "Section 17",
           "page": 294,
           "unit": ""
         },
         {
-          "title": "Section 21",
+          "title": "Section 18",
           "page": 311,
           "unit": ""
         },
         {
-          "title": "Section 22",
+          "title": "Section 19",
           "page": 329,
           "unit": ""
         },
         {
-          "title": "Section 23",
+          "title": "Section 20",
           "page": 347,
           "unit": ""
         },
         {
-          "title": "Section 24",
+          "title": "Section 21",
           "page": 365,
           "unit": ""
         },
         {
-          "title": "Section 25",
+          "title": "Section 22",
           "page": 382,
           "unit": ""
         },
         {
-          "title": "Section 26",
+          "title": "Section 23",
           "page": 391,
           "unit": ""
         },
         {
-          "title": "Section 27",
+          "title": "Section 24",
           "page": 407,
           "unit": ""
         },
         {
-          "title": "Section 28",
+          "title": "Section 25",
           "page": 424,
           "unit": ""
         },
         {
-          "title": "Section 29",
+          "title": "Section 26",
           "page": 440,
           "unit": ""
         },
         {
-          "title": "Section 30",
+          "title": "Section 27",
           "page": 458,
           "unit": ""
         },
         {
-          "title": "Section 31",
+          "title": "Section 28",
           "page": 475,
           "unit": ""
         },
         {
-          "title": "Section 32",
+          "title": "Section 29",
           "page": 496,
           "unit": ""
         },
         {
-          "title": "Section 33",
+          "title": "Section 30",
           "page": 521,
           "unit": ""
         },
         {
-          "title": "Section 34",
+          "title": "Section 31",
           "page": 529,
           "unit": ""
         },
         {
-          "title": "Section 35",
+          "title": "Section 32",
           "page": 552,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "es-274-chemistry-new-era-chemistry-text-book-pa": {
       "kind": "drive-file",
@@ -9916,7 +10027,8 @@
           "page": 810,
           "unit": ""
         }
-      ]
+      ],
+      "chapterSource": "page-divisions"
     },
     "nc-275-chemistry-nootan-madhyamik-rasayan-dr-h-": {
       "kind": "drive-file",

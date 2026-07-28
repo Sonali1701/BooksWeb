@@ -251,7 +251,17 @@ function bookMatchesFilters(book, query) {
 // listing, then the standard syllabus outline for its subject and class.
 function readerCollection(book) {
   if (book && book.chapters && book.chapters.length) {
-    return { mode: "chapters", items: book.chapters, navigable: true };
+    // Page breaks recovered from a scanner's outline are real positions with
+    // no names. They navigate perfectly well, but calling them a contents
+    // list would promise something the file does not contain. Judged from the
+    // titles as well as the recorded source, so entries extracted before that
+    // source existed are described just as accurately.
+    return {
+      mode: "chapters",
+      items: book.chapters,
+      navigable: true,
+      unnamed: book.chapterSource === "page-divisions" || mostlyUnnamed(book.chapters)
+    };
   }
   if (book && book.folderItems && book.folderItems.length) {
     return { mode: "folder", items: book.folderItems, navigable: true };
@@ -265,6 +275,15 @@ function readerCollection(book) {
     };
   }
   return { mode: "none", items: [], navigable: false };
+}
+
+// "Section 4" is a position, not a title. When most entries read that way the
+// list is a set of page breaks rather than a table of contents.
+function mostlyUnnamed(chapters) {
+  if (!chapters.length) return false;
+  const placeholder = chapters.filter((chapter) =>
+    /^section\s+\d+$/i.test(String(chapter.title || "").trim())).length;
+  return placeholder / chapters.length >= 0.7;
 }
 
 function subjectKeys(subject) {
@@ -332,6 +351,7 @@ function folderGroup(item) {
 function collectionLabel(collection) {
   if (collection.mode === "folder") return "Files";
   if (collection.mode === "syllabus") return "Syllabus contents";
+  if (collection.unnamed) return "Page divisions";
   return "Contents";
 }
 
@@ -364,11 +384,15 @@ function renderChapterList(book) {
     : "Find a chapter...";
   chapterCount.textContent = `(${collection.items.length})`;
 
-  contentsNote.hidden = collection.navigable;
+  contentsNote.hidden = collection.navigable && !collection.unnamed;
   if (!collection.navigable) {
     contentsNote.textContent =
       `Outline of the ${collection.label}. This material is one document, so the ` +
       "list is for reference — use the viewer's page controls or search to reach a chapter.";
+  } else if (collection.unnamed) {
+    contentsNote.textContent =
+      "This scan carries page breaks but no chapter names, so sections are numbered " +
+      "by position. Each one still jumps to the right page.";
   }
 
   let html = "";
@@ -425,6 +449,7 @@ function chapterBadgeFor(collection) {
   if (collection.mode === "syllabus") {
     return `<span class="chapter-badge outline">${count} topics</span>`;
   }
+  if (collection.unnamed) return `<span class="chapter-badge">${count} sections</span>`;
   return `<span class="chapter-badge">${count} chapters</span>`;
 }
 
@@ -1568,6 +1593,11 @@ async function loadBooks() {
       chapters: book.chapters && book.chapters.length
         ? book.chapters
         : (resource.chapters || []),
+      // Only extracted chapters carry a source; hand-authored ones are named
+      // by definition, so they must not inherit the extractor's label.
+      chapterSource: book.chapters && book.chapters.length
+        ? "authored"
+        : (resource.chapterSource || ""),
       folderItems: resource.folderItems || []
     });
   });
