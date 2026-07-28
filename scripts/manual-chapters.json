@@ -1,0 +1,258 @@
+{
+  "_comment": [
+    "Chapter lists read off each book's own printed contents page and then",
+    "checked against the pages they point at. These books are scans with no",
+    "text layer, so no parser can reach this; the pages below were confirmed",
+    "by rendering each one and seeing the chapter open there.",
+    "",
+    "'offset' records printedPage - pdfPage, measured from folios sampled",
+    "across the book. It is kept for provenance: it is what makes the page",
+    "numbers checkable rather than assertions.",
+    "",
+    "'page' is the 1-based PDF page, already offset-corrected.",
+    "Apply with: py scripts/apply_manual_chapters.py --write"
+  ],
+  "es-273-chemistry-nootan-isc-chemistry-part-2": {
+    "title": "Nootan ISC Chemistry Class XII Part 2",
+    "offset": 548,
+    "offsetSamples": [
+      [
+        8,
+        556
+      ],
+      [
+        100,
+        648
+      ],
+      [
+        300,
+        848
+      ],
+      [
+        500,
+        1048
+      ]
+    ],
+    "verified": "7/7 chapter pages confirmed to open their unit",
+    "chapters": [
+      {
+        "title": "Unit 10: Haloalkanes and Haloarenes",
+        "page": 7
+      },
+      {
+        "title": "Unit 11: Alcohols, Phenols and Ethers",
+        "page": 74
+      },
+      {
+        "title": "Unit 12: Aldehydes, Ketones and Carboxylic Acids",
+        "page": 156
+      },
+      {
+        "title": "Unit 13: Organic Compounds Containing Nitrogen",
+        "page": 285
+      },
+      {
+        "title": "Unit 14: Biomolecules",
+        "page": 364
+      },
+      {
+        "title": "Unit 15: Polymers",
+        "page": 422
+      },
+      {
+        "title": "Unit 16: Chemistry in Everyday Life",
+        "page": 459
+      }
+    ]
+  },
+  "es-271-chemistry-objective-chemistry-part-ii": {
+    "title": "GRB Objective Chemistry for JEE (2nd Year Programme)",
+    "offset": -16,
+    "offsetSamples": [
+      [
+        30,
+        14
+      ],
+      [
+        200,
+        184
+      ],
+      [
+        400,
+        384
+      ],
+      [
+        600,
+        584
+      ]
+    ],
+    "verified": "6/6 sampled chapter pages confirmed to open their unit",
+    "chapters": [
+      {
+        "title": "Unit 1: Solid State",
+        "page": 17
+      },
+      {
+        "title": "Unit 2: Solutions",
+        "page": 72
+      },
+      {
+        "title": "Unit 3A: Electrochemistry (Electrolysis and Electrochemical Cells)",
+        "page": 127
+      },
+      {
+        "title": "Unit 3B: Electrochemistry (Conductivity of Solutions)",
+        "page": 196
+      },
+      {
+        "title": "Unit 4: Chemical Kinetics",
+        "page": 218
+      },
+      {
+        "title": "Unit 5A: Surface Chemistry — Adsorption and Catalysis",
+        "page": 274
+      },
+      {
+        "title": "Unit 5B: Surface Chemistry — Colloidal State",
+        "page": 305
+      },
+      {
+        "title": "Unit 6: General Principles and Process of Isolation of Elements",
+        "page": 331
+      },
+      {
+        "title": "Unit 7A: p-Block Elements (Group 15 — The Nitrogen Family)",
+        "page": 360
+      },
+      {
+        "title": "Unit 7B: p-Block Elements (Group 16 — The Oxygen Family)",
+        "page": 420
+      },
+      {
+        "title": "Unit 7C: p-Block Elements (Group 17 — The Halogen Family)",
+        "page": 465
+      },
+      {
+        "title": "Unit 7D: p-Block Elements (Group 18 — The Noble Gases)",
+        "page": 511
+      },
+      {
+        "title": "Unit 8: d-Block and f-Block Elements",
+        "page": 532
+      },
+      {
+        "title": "Unit 9: Coordination Compounds",
+        "page": 607
+      },
+      {
+        "title": "Unit 10: Haloalkanes and Haloarenes",
+        "page": 671
+      },
+      {
+        "title": "Unit 11: Alcohols, Phenols and Ethers",
+        "page": 711
+      },
+      {
+        "title": "Unit 12A: Aldehydes and Ketones",
+        "page": 776
+      },
+      {
+        "title": "Unit 12B: Carboxylic Acids and Their Derivatives",
+        "page": 829
+      },
+      {
+        "title": "Unit 13: Organic Compounds Containing Nitrogen",
+        "page": 888
+      },
+      {
+        "title": "Unit 14: Biomolecules",
+        "page": 951
+      },
+      {
+        "title": "Unit 15: Polymers",
+        "page": 1010
+      },
+      {
+        "title": "Unit 16: Chemistry in Everyday Life",
+        "page": 1033
+      },
+      {
+        "title": "Additional Unit 1: Chemistry of Some Biological Processes",
+        "page": 1060
+      },
+      {
+        "title": "Additional Unit 2: Analytical Chemistry",
+        "page": 1076
+      }
+    ]
+  },
+  "es-274-chemistry-new-era-chemistry-text-book-pa": {
+    "title": "GRB New Era Chemistry Class XII (Part I)",
+    "offset": -10,
+    "offsetSamples": [
+      [
+        40,
+        30
+      ],
+      [
+        300,
+        290
+      ],
+      [
+        600,
+        590
+      ],
+      [
+        730,
+        722
+      ]
+    ],
+    "verified": "9/9 chapter pages confirmed to open their unit",
+    "note": [
+      "The offset is not constant: it is -10 through most of the book and -8",
+      "by Unit 9, so the printed numbers alone would have put that unit two",
+      "pages off. Every page here was checked individually rather than",
+      "derived, which is how the drift was caught.",
+      "The scan is also missing the contents page listing Units 1 and 2;",
+      "those two were located by searching the pages themselves."
+    ],
+    "chapters": [
+      {
+        "title": "Unit 1: Solid State",
+        "page": 11
+      },
+      {
+        "title": "Unit 2: Solutions",
+        "page": 91
+      },
+      {
+        "title": "Unit 3: Electrochemistry",
+        "page": 186
+      },
+      {
+        "title": "Unit 4: Chemical Kinetics",
+        "page": 286
+      },
+      {
+        "title": "Unit 5: Surface Chemistry",
+        "page": 389
+      },
+      {
+        "title": "Unit 6: General Principles and Processes of Isolation of Elements",
+        "page": 449
+      },
+      {
+        "title": "Unit 7: p-Block Elements",
+        "page": 509
+      },
+      {
+        "title": "Unit 8: d- and f-Block Elements",
+        "page": 650
+      },
+      {
+        "title": "Unit 9: Coordination Compounds",
+        "page": 728
+      }
+    ]
+  }
+}

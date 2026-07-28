@@ -9204,282 +9204,127 @@
       "size": 111865883,
       "chapters": [
         {
-          "title": "Section 1",
-          "page": 1,
+          "title": "Unit 1: Solid State",
+          "page": 17,
           "unit": ""
         },
         {
-          "title": "Section 2",
-          "page": 20,
+          "title": "Unit 2: Solutions",
+          "page": 72,
           "unit": ""
         },
         {
-          "title": "Section 3",
-          "page": 38,
+          "title": "Unit 3A: Electrochemistry (Electrolysis and Electrochemical Cells)",
+          "page": 127,
           "unit": ""
         },
         {
-          "title": "Section 4",
-          "page": 57,
+          "title": "Unit 3B: Electrochemistry (Conductivity of Solutions)",
+          "page": 196,
           "unit": ""
         },
         {
-          "title": "Section 5",
-          "page": 80,
+          "title": "Unit 4: Chemical Kinetics",
+          "page": 218,
           "unit": ""
         },
         {
-          "title": "Section 6",
-          "page": 99,
+          "title": "Unit 5A: Surface Chemistry — Adsorption and Catalysis",
+          "page": 274,
           "unit": ""
         },
         {
-          "title": "Section 7",
-          "page": 121,
+          "title": "Unit 5B: Surface Chemistry — Colloidal State",
+          "page": 305,
           "unit": ""
         },
         {
-          "title": "Section 8",
-          "page": 140,
+          "title": "Unit 6: General Principles and Process of Isolation of Elements",
+          "page": 331,
           "unit": ""
         },
         {
-          "title": "Section 9",
-          "page": 160,
+          "title": "Unit 7A: p-Block Elements (Group 15 — The Nitrogen Family)",
+          "page": 360,
           "unit": ""
         },
         {
-          "title": "Section 10",
-          "page": 181,
+          "title": "Unit 7B: p-Block Elements (Group 16 — The Oxygen Family)",
+          "page": 420,
           "unit": ""
         },
         {
-          "title": "Section 11",
-          "page": 203,
-          "unit": ""
-        },
-        {
-          "title": "Section 12",
-          "page": 225,
-          "unit": ""
-        },
-        {
-          "title": "Section 13",
-          "page": 245,
-          "unit": ""
-        },
-        {
-          "title": "Section 14",
-          "page": 267,
-          "unit": ""
-        },
-        {
-          "title": "Section 15",
-          "page": 286,
-          "unit": ""
-        },
-        {
-          "title": "Section 16",
-          "page": 299,
-          "unit": ""
-        },
-        {
-          "title": "Section 17",
-          "page": 320,
-          "unit": ""
-        },
-        {
-          "title": "Section 18",
-          "page": 340,
-          "unit": ""
-        },
-        {
-          "title": "Section 19",
-          "page": 363,
-          "unit": ""
-        },
-        {
-          "title": "Section 20",
-          "page": 379,
-          "unit": ""
-        },
-        {
-          "title": "Section 21",
-          "page": 399,
-          "unit": ""
-        },
-        {
-          "title": "Section 22",
-          "page": 423,
-          "unit": ""
-        },
-        {
-          "title": "Section 23",
-          "page": 441,
-          "unit": ""
-        },
-        {
-          "title": "Section 24",
+          "title": "Unit 7C: p-Block Elements (Group 17 — The Halogen Family)",
           "page": 465,
           "unit": ""
         },
         {
-          "title": "Section 25",
-          "page": 482,
+          "title": "Unit 7D: p-Block Elements (Group 18 — The Noble Gases)",
+          "page": 511,
           "unit": ""
         },
         {
-          "title": "Section 26",
-          "page": 502,
+          "title": "Unit 8: d-Block and f-Block Elements",
+          "page": 532,
           "unit": ""
         },
         {
-          "title": "Section 27",
-          "page": 526,
+          "title": "Unit 9: Coordination Compounds",
+          "page": 607,
           "unit": ""
         },
         {
-          "title": "Section 28",
-          "page": 545,
+          "title": "Unit 10: Haloalkanes and Haloarenes",
+          "page": 671,
           "unit": ""
         },
         {
-          "title": "Section 29",
-          "page": 562,
+          "title": "Unit 11: Alcohols, Phenols and Ethers",
+          "page": 711,
           "unit": ""
         },
         {
-          "title": "Section 30",
-          "page": 581,
+          "title": "Unit 12A: Aldehydes and Ketones",
+          "page": 776,
           "unit": ""
         },
         {
-          "title": "Section 31",
-          "page": 602,
+          "title": "Unit 12B: Carboxylic Acids and Their Derivatives",
+          "page": 829,
           "unit": ""
         },
         {
-          "title": "Section 32",
-          "page": 626,
+          "title": "Unit 13: Organic Compounds Containing Nitrogen",
+          "page": 888,
           "unit": ""
         },
         {
-          "title": "Section 33",
-          "page": 646,
+          "title": "Unit 14: Biomolecules",
+          "page": 951,
           "unit": ""
         },
         {
-          "title": "Section 34",
-          "page": 666,
+          "title": "Unit 15: Polymers",
+          "page": 1010,
           "unit": ""
         },
         {
-          "title": "Section 35",
-          "page": 681,
+          "title": "Unit 16: Chemistry in Everyday Life",
+          "page": 1033,
           "unit": ""
         },
         {
-          "title": "Section 36",
-          "page": 706,
+          "title": "Additional Unit 1: Chemistry of Some Biological Processes",
+          "page": 1060,
           "unit": ""
         },
         {
-          "title": "Section 37",
-          "page": 736,
-          "unit": ""
-        },
-        {
-          "title": "Section 38",
-          "page": 758,
-          "unit": ""
-        },
-        {
-          "title": "Section 39",
-          "page": 784,
-          "unit": ""
-        },
-        {
-          "title": "Section 40",
-          "page": 807,
-          "unit": ""
-        },
-        {
-          "title": "Section 41",
-          "page": 833,
-          "unit": ""
-        },
-        {
-          "title": "Section 42",
-          "page": 857,
-          "unit": ""
-        },
-        {
-          "title": "Section 43",
-          "page": 879,
-          "unit": ""
-        },
-        {
-          "title": "Section 44",
-          "page": 905,
-          "unit": ""
-        },
-        {
-          "title": "Section 45",
-          "page": 928,
-          "unit": ""
-        },
-        {
-          "title": "Section 46",
-          "page": 929,
-          "unit": ""
-        },
-        {
-          "title": "Section 47",
-          "page": 958,
-          "unit": ""
-        },
-        {
-          "title": "Section 48",
-          "page": 978,
-          "unit": ""
-        },
-        {
-          "title": "Section 49",
-          "page": 999,
-          "unit": ""
-        },
-        {
-          "title": "Section 50",
-          "page": 1024,
-          "unit": ""
-        },
-        {
-          "title": "Section 51",
-          "page": 1047,
-          "unit": ""
-        },
-        {
-          "title": "Section 52",
-          "page": 1069,
-          "unit": ""
-        },
-        {
-          "title": "Section 53",
-          "page": 1091,
-          "unit": ""
-        },
-        {
-          "title": "Section 54",
-          "page": 1115,
-          "unit": ""
-        },
-        {
-          "title": "Section 55",
-          "page": 1136,
+          "title": "Additional Unit 2: Analytical Chemistry",
+          "page": 1076,
           "unit": ""
         }
       ],
-      "chapterSource": "page-divisions"
+      "chapterSource": "contents-page"
     },
     "es-272-maths-nootan-ganit": {
       "kind": "drive-file",
@@ -9625,167 +9470,42 @@
       "size": 65899871,
       "chapters": [
         {
-          "title": "Section 1",
-          "page": 1,
+          "title": "Unit 10: Haloalkanes and Haloarenes",
+          "page": 7,
           "unit": ""
         },
         {
-          "title": "Section 2",
-          "page": 3,
+          "title": "Unit 11: Alcohols, Phenols and Ethers",
+          "page": 74,
           "unit": ""
         },
         {
-          "title": "Section 3",
-          "page": 5,
+          "title": "Unit 12: Aldehydes, Ketones and Carboxylic Acids",
+          "page": 156,
           "unit": ""
         },
         {
-          "title": "Section 4",
-          "page": 21,
+          "title": "Unit 13: Organic Compounds Containing Nitrogen",
+          "page": 285,
           "unit": ""
         },
         {
-          "title": "Section 5",
-          "page": 38,
+          "title": "Unit 14: Biomolecules",
+          "page": 364,
           "unit": ""
         },
         {
-          "title": "Section 6",
-          "page": 97,
+          "title": "Unit 15: Polymers",
+          "page": 422,
           "unit": ""
         },
         {
-          "title": "Section 7",
-          "page": 115,
-          "unit": ""
-        },
-        {
-          "title": "Section 8",
-          "page": 133,
-          "unit": ""
-        },
-        {
-          "title": "Section 9",
-          "page": 153,
-          "unit": ""
-        },
-        {
-          "title": "Section 10",
-          "page": 165,
-          "unit": ""
-        },
-        {
-          "title": "Section 11",
-          "page": 184,
-          "unit": ""
-        },
-        {
-          "title": "Section 12",
-          "page": 202,
-          "unit": ""
-        },
-        {
-          "title": "Section 13",
-          "page": 220,
-          "unit": ""
-        },
-        {
-          "title": "Section 14",
-          "page": 238,
-          "unit": ""
-        },
-        {
-          "title": "Section 15",
-          "page": 256,
-          "unit": ""
-        },
-        {
-          "title": "Section 16",
-          "page": 275,
-          "unit": ""
-        },
-        {
-          "title": "Section 17",
-          "page": 294,
-          "unit": ""
-        },
-        {
-          "title": "Section 18",
-          "page": 311,
-          "unit": ""
-        },
-        {
-          "title": "Section 19",
-          "page": 329,
-          "unit": ""
-        },
-        {
-          "title": "Section 20",
-          "page": 347,
-          "unit": ""
-        },
-        {
-          "title": "Section 21",
-          "page": 365,
-          "unit": ""
-        },
-        {
-          "title": "Section 22",
-          "page": 382,
-          "unit": ""
-        },
-        {
-          "title": "Section 23",
-          "page": 391,
-          "unit": ""
-        },
-        {
-          "title": "Section 24",
-          "page": 407,
-          "unit": ""
-        },
-        {
-          "title": "Section 25",
-          "page": 424,
-          "unit": ""
-        },
-        {
-          "title": "Section 26",
-          "page": 440,
-          "unit": ""
-        },
-        {
-          "title": "Section 27",
-          "page": 458,
-          "unit": ""
-        },
-        {
-          "title": "Section 28",
-          "page": 475,
-          "unit": ""
-        },
-        {
-          "title": "Section 29",
-          "page": 496,
-          "unit": ""
-        },
-        {
-          "title": "Section 30",
-          "page": 521,
-          "unit": ""
-        },
-        {
-          "title": "Section 31",
-          "page": 529,
-          "unit": ""
-        },
-        {
-          "title": "Section 32",
-          "page": 552,
+          "title": "Unit 16: Chemistry in Everyday Life",
+          "page": 459,
           "unit": ""
         }
       ],
-      "chapterSource": "page-divisions"
+      "chapterSource": "contents-page"
     },
     "es-274-chemistry-new-era-chemistry-text-book-pa": {
       "kind": "drive-file",
@@ -9798,237 +9518,52 @@
       "size": 94867841,
       "chapters": [
         {
-          "title": "Section 1",
-          "page": 1,
+          "title": "Unit 1: Solid State",
+          "page": 11,
           "unit": ""
         },
         {
-          "title": "Section 2",
-          "page": 21,
+          "title": "Unit 2: Solutions",
+          "page": 91,
           "unit": ""
         },
         {
-          "title": "Section 3",
-          "page": 39,
+          "title": "Unit 3: Electrochemistry",
+          "page": 186,
           "unit": ""
         },
         {
-          "title": "Section 4",
-          "page": 43,
+          "title": "Unit 4: Chemical Kinetics",
+          "page": 286,
           "unit": ""
         },
         {
-          "title": "Section 5",
-          "page": 64,
+          "title": "Unit 5: Surface Chemistry",
+          "page": 389,
           "unit": ""
         },
         {
-          "title": "Section 6",
-          "page": 84,
+          "title": "Unit 6: General Principles and Processes of Isolation of Elements",
+          "page": 449,
           "unit": ""
         },
         {
-          "title": "Section 7",
-          "page": 103,
-          "unit": ""
-        },
-        {
-          "title": "Section 8",
-          "page": 121,
-          "unit": ""
-        },
-        {
-          "title": "Section 9",
-          "page": 141,
-          "unit": ""
-        },
-        {
-          "title": "Section 10",
-          "page": 160,
-          "unit": ""
-        },
-        {
-          "title": "Section 11",
-          "page": 178,
-          "unit": ""
-        },
-        {
-          "title": "Section 12",
-          "page": 196,
-          "unit": ""
-        },
-        {
-          "title": "Section 13",
-          "page": 213,
-          "unit": ""
-        },
-        {
-          "title": "Section 14",
-          "page": 230,
-          "unit": ""
-        },
-        {
-          "title": "Section 15",
-          "page": 250,
-          "unit": ""
-        },
-        {
-          "title": "Section 16",
-          "page": 269,
-          "unit": ""
-        },
-        {
-          "title": "Section 17",
-          "page": 289,
-          "unit": ""
-        },
-        {
-          "title": "Section 18",
-          "page": 306,
-          "unit": ""
-        },
-        {
-          "title": "Section 19",
-          "page": 324,
-          "unit": ""
-        },
-        {
-          "title": "Section 20",
-          "page": 341,
-          "unit": ""
-        },
-        {
-          "title": "Section 21",
-          "page": 364,
-          "unit": ""
-        },
-        {
-          "title": "Section 22",
-          "page": 387,
-          "unit": ""
-        },
-        {
-          "title": "Section 23",
-          "page": 404,
-          "unit": ""
-        },
-        {
-          "title": "Section 24",
-          "page": 420,
-          "unit": ""
-        },
-        {
-          "title": "Section 25",
-          "page": 440,
-          "unit": ""
-        },
-        {
-          "title": "Section 26",
-          "page": 457,
-          "unit": ""
-        },
-        {
-          "title": "Section 27",
-          "page": 473,
-          "unit": ""
-        },
-        {
-          "title": "Section 28",
-          "page": 491,
-          "unit": ""
-        },
-        {
-          "title": "Section 29",
+          "title": "Unit 7: p-Block Elements",
           "page": 509,
           "unit": ""
         },
         {
-          "title": "Section 30",
-          "page": 524,
+          "title": "Unit 8: d- and f-Block Elements",
+          "page": 650,
           "unit": ""
         },
         {
-          "title": "Section 31",
-          "page": 540,
-          "unit": ""
-        },
-        {
-          "title": "Section 32",
-          "page": 556,
-          "unit": ""
-        },
-        {
-          "title": "Section 33",
-          "page": 572,
-          "unit": ""
-        },
-        {
-          "title": "Section 34",
-          "page": 588,
-          "unit": ""
-        },
-        {
-          "title": "Section 35",
-          "page": 603,
-          "unit": ""
-        },
-        {
-          "title": "Section 36",
-          "page": 624,
-          "unit": ""
-        },
-        {
-          "title": "Section 37",
-          "page": 645,
-          "unit": ""
-        },
-        {
-          "title": "Section 38",
-          "page": 663,
-          "unit": ""
-        },
-        {
-          "title": "Section 39",
-          "page": 680,
-          "unit": ""
-        },
-        {
-          "title": "Section 40",
-          "page": 696,
-          "unit": ""
-        },
-        {
-          "title": "Section 41",
-          "page": 715,
-          "unit": ""
-        },
-        {
-          "title": "Section 42",
-          "page": 735,
-          "unit": ""
-        },
-        {
-          "title": "Section 43",
-          "page": 752,
-          "unit": ""
-        },
-        {
-          "title": "Section 44",
-          "page": 771,
-          "unit": ""
-        },
-        {
-          "title": "Section 45",
-          "page": 791,
-          "unit": ""
-        },
-        {
-          "title": "Section 46",
-          "page": 810,
+          "title": "Unit 9: Coordination Compounds",
+          "page": 728,
           "unit": ""
         }
       ],
-      "chapterSource": "page-divisions"
+      "chapterSource": "contents-page"
     },
     "nc-275-chemistry-nootan-madhyamik-rasayan-dr-h-": {
       "kind": "drive-file",
