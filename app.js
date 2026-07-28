@@ -47,6 +47,10 @@ let resourceSummary = null;
 let chapterMap = null;
 let drivePreviewFallback = false; // used only when localStorage is unavailable
 let activeDriveFile = null; // { fileId, url } — the one blob URL held at a time
+// True once a chapter has actually been chosen. Opening a book selects its
+// first chapter automatically, and that must not be read as a request to
+// download the file — only a deliberate jump justifies the wait.
+let chapterPicked = false;
 
 // Books flagged localOnly (large local demo files) only render when running locally.
 const IS_LOCAL = ["localhost", "127.0.0.1", ""].includes(location.hostname);
@@ -404,8 +408,11 @@ function renderChapterList(book) {
       lastUnit = unit;
     }
     const detail = collectionDetail(collection, item, index);
+    // An entry with no page behind it cannot move the viewer. Marking it says
+    // so before it is clicked, rather than leaving a button that looks broken.
+    const reference = collection.mode === "syllabus" ? " reference" : "";
     html += `
-      <button class="chapter-button ${index === selectedChapterIndex ? "active" : ""}" type="button" data-index="${index}">
+      <button class="chapter-button${reference} ${index === selectedChapterIndex ? "active" : ""}" type="button" data-index="${index}">
         <span>${escapeHtml(item.title)}</span>
         ${detail ? `<small>${escapeHtml(detail)}</small>` : ""}
       </button>`;
@@ -415,6 +422,7 @@ function renderChapterList(book) {
   chapterList.querySelectorAll(".chapter-button").forEach((button) => {
     button.addEventListener("click", () => {
       selectedChapterIndex = Number(button.dataset.index);
+      chapterPicked = true;
       renderReaderView();
       if (isMobile()) closeSheet();
     });
@@ -504,6 +512,7 @@ function selectBook(book) {
   const collection = readerCollection(book);
   // Free a held Drive download as soon as the reader moves to another file.
   if (activeDriveFile && activeDriveFile.fileId !== driveFileId(book)) releaseDriveFile();
+  chapterPicked = false;
   selectedBook = book;
   // Reference outlines open on the whole document; real chapters open on the first one.
   selectedChapterIndex = collection.navigable && collection.items.length ? 0 : null;
@@ -1101,6 +1110,12 @@ function showNoPdf(book) {
 function wholeBookStatus(book, hasChapters) {
   if (bookPdfAvailable(book)) return hasChapters ? "Complete book" : book.pdf;
   if (book.localOnly) return "Local-only sample";
+  // Reading from the fetched copy, not Drive's frame — say so, since the two
+  // behave differently the moment a chapter is clicked.
+  if (activeDriveFile && activeDriveFile.fileId === driveFileId(book)) {
+    const account = driveAccountLabel();
+    return account ? `Opened from Google Drive · ${account}` : "Opened from Google Drive";
+  }
   if (isPublicDriveFile(book) && driveUsesApi(book)) {
     const account = driveAccountLabel();
     if (driveSignedIn()) return account ? `Google Drive · ${account}` : "Opened from Google Drive";
@@ -1126,9 +1141,33 @@ function wholeBookStatus(book, hasChapters) {
 function showWholeBook(book, page) {
   if (bookPdfAvailable(book)) {
     showPdf(book.pdf, page || null);
-  } else if (book.localOnly) {
+    return;
+  }
+  if (book.localOnly) {
     showLocalOnly(book);
-  } else if (isPublicDriveFile(book) && driveUsesApi(book)) {
+    return;
+  }
+
+  const fileId = driveFileId(book);
+
+  // Already downloaded: keep reading from it rather than dropping back to the
+  // Drive frame, which would throw the file away and lose page jumps again.
+  if (fileId && activeDriveFile && activeDriveFile.fileId === fileId) {
+    showBlobPdf(book, activeDriveFile.url, page);
+    return;
+  }
+
+  // A page anchor only lands in a viewer we control. Drive's preview frame
+  // ignores #page=, so a chapter click there moves nothing and reads as a
+  // broken button — the chapter number is right, the viewer just will not act
+  // on it. Fetching the file gives a viewer that does, so asking for a page is
+  // itself the reason to take the slower route.
+  if (page && chapterPicked && fileId && driveCanFetch(isPublicDriveFile(book))) {
+    showAuthorisedDrive(book, page);
+    return;
+  }
+
+  if (isPublicDriveFile(book) && driveUsesApi(book)) {
     // Public, but Drive's viewer will not render it — fetch it ourselves.
     // An API key covers this without anyone signing in.
     if (driveCanFetch(true)) showAuthorisedDrive(book, page);
@@ -1169,7 +1208,7 @@ function renderReaderView() {
     const item = selectedChapterIndex !== null ? collection.items[selectedChapterIndex] : null;
     readerFileTitle.textContent = item ? item.title : book.title;
     readerFileStatus.textContent = item
-      ? `Chapter ${selectedChapterIndex + 1} of ${collection.items.length} · outline only`
+      ? `Chapter ${selectedChapterIndex + 1} of ${collection.items.length} — no page link, search the document for it`
       : wholeBookStatus(book, false);
     showWholeBook(book);
     return;
@@ -1330,6 +1369,7 @@ function bindEvents() {
   prevChapter.addEventListener("click", () => {
     if (selectedChapterIndex === null) selectedChapterIndex = 0;
     selectedChapterIndex = Math.max(0, selectedChapterIndex - 1);
+    chapterPicked = true;
     renderReaderView();
     scrollActiveChapterIntoView();
   });
@@ -1338,6 +1378,7 @@ function bindEvents() {
     const total = readerCollection(selectedBook).items.length;
     if (selectedChapterIndex === null) selectedChapterIndex = -1;
     selectedChapterIndex = Math.min(total - 1, selectedChapterIndex + 1);
+    chapterPicked = true;
     renderReaderView();
     scrollActiveChapterIntoView();
   });

@@ -781,6 +781,25 @@ code {
   font-weight: 800;
 }
 
+/* Outline entries carry no page, so they cannot move the viewer. Styled flat
+   rather than as raised buttons so that reads as intended, not as a failure. */
+.chapter-button.reference {
+  background: transparent;
+  border-left: 2px solid var(--line);
+  border-radius: 0 8px 8px 0;
+  padding-left: 10px;
+}
+
+.chapter-button.reference:hover {
+  background: #f2f6f4;
+  border-left-color: var(--green);
+}
+
+.chapter-button.reference.active {
+  background: #e9f3ef;
+  border-left-color: var(--green);
+}
+
 /* ---------- reader actions / facts ---------- */
 
 .button {
