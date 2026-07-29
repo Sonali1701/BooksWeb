@@ -24,10 +24,6 @@
       "httpStatus": 200,
       "finalUrl": "https://ncert.nic.in/textbook.php"
     },
-    "campbell-biology-10e": {
-      "kind": "local",
-      "access": "missing"
-    },
     "es-1-botany-aakash": {
       "kind": "drive-folder",
       "access": "public",
@@ -2220,30 +2216,6 @@
       "fileId": "1AaVLU7TIlvIr3RVYVKElSC4ifD5yToe3",
       "httpStatus": 401
     },
-    "es-48-maths-ahsec": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1SFdW8DGWDLOuaVre76o-jOaXt3x74zPv",
-      "httpStatus": 404
-    },
-    "es-49-physics-ahsec": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1PXEaQ0dyBdeyc8RJ7S_bk_MYV0oxxMPO",
-      "httpStatus": 404
-    },
-    "es-50-chemistry-ahsec": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "14HXhEsroZCMi92CcjHDYEe3k8elmu2BV",
-      "httpStatus": 404
-    },
-    "es-51-biology-ahsec": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1D-JphXOe2YjbKGI1vHOmfOXEZvrYBzvw",
-      "httpStatus": 404
-    },
     "es-52-maths-bansal": {
       "kind": "drive-folder",
       "access": "public",
@@ -3348,12 +3320,6 @@
       "fileId": "17HtfIWJE7UcXXM0vbFIz18VC7YrULd_y",
       "httpStatus": 401
     },
-    "es-83-biology-objective-chapterwise-mcqs": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1DsOCGAulh6OpqP39XBsQGWRraoRTj9nd",
-      "httpStatus": 404
-    },
     "es-84-biology-disha-ncert-xtract": {
       "kind": "drive-file",
       "access": "restricted",
@@ -4165,54 +4131,6 @@
       "httpStatus": 200,
       "finalUrl": "https://schools.aglasem.com/106277/"
     },
-    "es-101-physics-jkbose": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1RfUQbQXeRmk6sHmLvQQxRDwZoh7YsBiU",
-      "httpStatus": 404
-    },
-    "es-102-chemistry-jkbose": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1vZBlg0dFnN871fSEkc2NSJXVmlvcm46X",
-      "httpStatus": 404
-    },
-    "es-103-biology-jkbose": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1MZPf3hhDhnHbt0m3Jl7JubuoyY94lXvT",
-      "httpStatus": 404
-    },
-    "es-104-maths-jkbose": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1mOYYe9WCAzr_YqIJhffWJ1aLO3k26Csx",
-      "httpStatus": 404
-    },
-    "es-105-maths-jac": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1tco4Uo6OoFVu7-ZGO4Zo570Pf2W4v6kE",
-      "httpStatus": 404
-    },
-    "es-106-physics-jac": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1kZr-VgdG_22r89woxlo6GevX_R92Ca0x",
-      "httpStatus": 404
-    },
-    "es-107-chemistry-jac": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1rRvYAjhsskCs8SYZLtZg6nBdL0XNJEMI",
-      "httpStatus": 404
-    },
-    "es-108-biology-jac": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1UH9eu6VwJaCKM9ejuCMWLc_iVzajMRCe",
-      "httpStatus": 404
-    },
     "es-109-chemistry-comprehensive-chemistry-volume": {
       "kind": "drive-file",
       "access": "restricted",
@@ -4242,54 +4160,6 @@
       "access": "restricted",
       "fileId": "1-Ehso-zXglseP3l8BLBSgoqLnAlgWuY_",
       "httpStatus": 401
-    },
-    "es-114-physics-modern-s-abc-of-physics": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-115-physics-modern-s-abc-of-physics": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-116-chemistry-modern-s-abc-of-chemistry": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-117-chemistry-modern-s-abc-of-chemistry": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-118-biology-modern-s-abc-of-biology": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-119-biology-modern-s-abc-of-biology": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-120-maths-modern-s-abc-of-maths": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
-    },
-    "es-121-maths-modern-s-abc-of-maths": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1t_U_j8yRa91wY6rl__qnVWuLzg-PtE7k",
-      "httpStatus": 404
     },
     "es-122-physics-ncert-fingertips": {
       "kind": "drive-file",
@@ -4358,30 +4228,6 @@
       "access": "restricted",
       "fileId": "1QP3_oLvMIQrswTfEfMdpXTUlqv1xOtwI",
       "httpStatus": 401
-    },
-    "es-132-chemistry-bse-odisha": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1Uv4U_1hdpx6IU1L9x5E6zm_ThLF7C6ce",
-      "httpStatus": 404
-    },
-    "es-133-maths-bse-odisha": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1_-_bHcv5HCTDTvfiCF3UvoISZ7zJQIPx",
-      "httpStatus": 404
-    },
-    "es-134-physics-bse-odisha": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1Uv4U_1hdpx6IU1L9x5E6zm_ThLF7C6ce",
-      "httpStatus": 404
-    },
-    "es-135-biology-bse-odisha": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1vjxhPyd3eyERG9YZM7X_6bvjarUJLT0x",
-      "httpStatus": 404
     },
     "es-136-maths-oswaal-qb": {
       "kind": "drive-file",
@@ -4454,12 +4300,6 @@
       "access": "public",
       "httpStatus": 200,
       "finalUrl": "https://schools.aglasem.com/64883/"
-    },
-    "es-148-chemistry-pseb": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1DN-CJn_6aH1Vhyt5UloGIM_NwQLnCTQg",
-      "httpStatus": 404
     },
     "es-149-maths-resonance": {
       "kind": "drive-folder",
@@ -7240,60 +7080,6 @@
       "fileId": "1R4BRhn2z4wwuUouL9_RXwTN_QmkVyKSb",
       "httpStatus": 401
     },
-    "es-160-botany-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1rCL3VG-JqqKsWDM1mV9DSnvrIldHSbc-",
-      "httpStatus": 404
-    },
-    "es-161-chemistry-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1bMNQ74wSexgjJjpbeRiKV9tPLjLaBfqv",
-      "httpStatus": 404
-    },
-    "es-162-physics-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1JhUhprc5ngweCaWSZ_8e9s2mlFGkuGhP",
-      "httpStatus": 404
-    },
-    "es-163-zoology-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "11DweEuI4c2XToACFneXaQQ3fum6hvcFn",
-      "httpStatus": 404
-    },
-    "es-164-maths-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1s-A5lht8V7KN33ItWs5uLtl3Nip3sLFE",
-      "httpStatus": 404
-    },
-    "es-165-botany-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "13e1YZisXc5tYbzSB5DT69MoO4fg0S6C8",
-      "httpStatus": 404
-    },
-    "es-166-chemistry-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "170Y6WsPTEASqlEGfCSltGZ_qlOHsQqpi",
-      "httpStatus": 404
-    },
-    "es-167-physics-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "1s_ttY5OhwyKg5KMCE7B4oTuI7PoJUA82",
-      "httpStatus": 404
-    },
-    "es-168-zoology-samacheer": {
-      "kind": "drive-folder",
-      "access": "missing",
-      "folderId": "18A_Z2YqbdTSTyuYEOC-xKKTQ82JNA0mW",
-      "httpStatus": 404
-    },
     "es-169-maths-samacheer": {
       "kind": "drive-folder",
       "access": "public",
@@ -9459,102 +9245,6 @@
         }
       ],
       "chapterSource": "contents-page"
-    },
-    "nc-275-chemistry-nootan-madhyamik-rasayan-dr-h-": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1gG6XCOEjoBJxFFL2EiXl3mT9yy8CIw9a",
-      "httpStatus": 404
-    },
-    "nc-276-physics-nootan-madhyamik-bhotik-vigyan-p": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1Zgfereg88dezHv5bZ19bA0SF46LuyCM0",
-      "httpStatus": 404
-    },
-    "nc-277-physics-nootan-madhyamik-bhotik-vigyan-p": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1nCbNva5dVBngAxcaVVCKFnQE4H459WXc",
-      "httpStatus": 404
-    },
-    "nc-278-maths-class-12-shree-bala-ji-ganit-dr-su": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1f-p9DIjGBSPAYiGYLrdHhxS7aUYd7oPk",
-      "httpStatus": 404
-    },
-    "nc-279-maths-maadhyamik-shiksha-parishad-u-pr-p": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1t-WbUvl1kxUhXVdS_xKU-3WJkTLR0Ir-",
-      "httpStatus": 404
-    },
-    "nc-280-maths-class-11-shree-balaji-ganit-dr-sud": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1xFule-LPu_Nr_j_5f3KC9BxZtXhFrsb_",
-      "httpStatus": 404
-    },
-    "nc-281-physics-class-11-nootan-madhyamik-bhotik": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1Askn3QnxTPKN1l97DORSQ8r8GHinzLAp",
-      "httpStatus": 404
-    },
-    "nc-282-physics-class-11-nootan-madhyamik-bhotik": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1L8HsPK1NVFjYQiuwXRbVl0FZaW-aFYup",
-      "httpStatus": 404
-    },
-    "nc-283-physics-bhautikee-kee-samajh-hc-verma-pa": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "18VEbAVLShnm3cA5XNiy6ho9h4cx_1u2o",
-      "httpStatus": 404
-    },
-    "nc-284-biology-31-years-chapterwise-biology-ari": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1FJCuSDMAGrDxkxfBEW-0bYPyxkvJW4Wr",
-      "httpStatus": 404
-    },
-    "nc-285-biology-objective-ncert-fingertips-biolo": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1tV3DTDGh4__F72pd0vypKqfSRWmuQ7es",
-      "httpStatus": 404
-    },
-    "nc-286-physics-ncert-fingertips-physics": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1y1mM_zLM3uo-YloMEJPswoeLHdK6n50s",
-      "httpStatus": 404
-    },
-    "nc-287-chemistry-ncert-fingertips-chemistry": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1UwIAi9bmyli2U3qY_A_bIngZG92HUQIP",
-      "httpStatus": 404
-    },
-    "nc-288-physics-jee-mains-physics-arihant": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1iaFYW-6nQ4zBrq00HOm7kHJQXptHsfOo",
-      "httpStatus": 404
-    },
-    "nc-289-maths-arihant-maths-jee": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "1KmrZxyaZhKdODM41LyzO11m92OMMql0T",
-      "httpStatus": 404
-    },
-    "nc-290-chemistry-arihant-chemistry": {
-      "kind": "drive-file",
-      "access": "missing",
-      "fileId": "19vA7-lDhDqBr7ESYLbnliqqJFX1w9k32",
-      "httpStatus": 404
     },
     "nc-291-maths-18-year-2006-2023-karnataka-cet-ch": {
       "kind": "drive-file",
