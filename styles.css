@@ -1054,6 +1054,33 @@ code {
   margin-top: 16px;
 }
 
+/* Large books now download on their own, so the wait needs to show itself
+   moving. A bare percentage reads as a stall on a slow connection. */
+.drive-bar {
+  display: block;
+  height: 6px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.drive-bar > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--green-dark);
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.drive-caution {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .link-button {
   padding: 0;
   color: var(--green-dark);

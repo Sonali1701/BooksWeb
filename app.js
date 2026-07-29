@@ -6,8 +6,6 @@ const PDF_BASE_URL = String(APP_CONFIG.pdfBaseUrl || "").trim().replace(/\/+$/, 
 const MOBILE_QUERY = "(max-width: 900px)";
 const DRIVE_SIGNIN_KEY = "obl:drive-signin";
 const WELCOME_KEY = "obl:welcome-dismissed";
-// Anything larger is downloaded only when the reader explicitly asks.
-const DRIVE_AUTOLOAD_LIMIT = 25 * 1024 * 1024;
 // Drive's own viewer refuses to render a PDF past roughly this size
 // ("This file is too large to preview"), whatever the sharing settings.
 // Files above it skip the Drive frame and are fetched through the API.
@@ -512,6 +510,10 @@ function selectBook(book) {
   const collection = readerCollection(book);
   // Free a held Drive download as soon as the reader moves to another file.
   if (activeDriveFile && activeDriveFile.fileId !== driveFileId(book)) releaseDriveFile();
+  // Moving on also stops a transfer still running for the previous book, which
+  // now starts by itself and would otherwise keep pulling bytes unwatched. It
+  // is not marked cancelled: coming back should download it, not refuse to.
+  if (driveDownload && driveDownload.fileId !== driveFileId(book)) cancelDriveDownload();
   chapterPicked = false;
   selectedBook = book;
   // Reference outlines open on the whole document; real chapters open on the first one.
@@ -883,18 +885,13 @@ function openDriveFile(book, fileId, label, page, publicFile) {
       return;
     }
 
-    // Large books are a real download on a phone, so they are never pulled
-    // without the reader asking for them.
-    if (meta.size && meta.size > DRIVE_AUTOLOAD_LIMIT) {
-      // The file is held in memory to be displayed, so the heaviest ones come
-      // with a warning rather than an unexplained crash on a small device.
-      const caution = meta.size > DRIVE_HEAVY_LIMIT
-        ? " A file this large needs a lot of memory — on a phone or an older machine, downloading it from Drive and opening it outside the browser may work better."
-        : "";
-      showDriveMessage(book, `drive-confirm-${fileId}`, "Ready to open",
-        `<em>${escapeHtml(meta.name || label)}</em> is ${escapeHtml(formatBytes(meta.size))}, so it is not downloaded until you ask.${caution}`,
-        `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}" data-public="${publicFile ? "1" : ""}">Open document (${escapeHtml(formatBytes(meta.size))})</button>` +
-        driveLinkButton(book, "Open in Drive instead"));
+    // The download starts on its own. Asking first made every large book cost
+    // an extra click to say yes to something the reader had already chosen by
+    // opening it, and the wait began only after that click.
+    // Stopping one is still the reader's call, so the progress panel carries a
+    // cancel button rather than a confirmation coming before it.
+    if (driveCancelled.has(fileId)) {
+      showDriveStopped(book, fileId, meta, label, publicFile);
       return;
     }
 
@@ -947,36 +944,87 @@ function driveAccountLabel() {
   return user ? (user.email || user.name || "") : "";
 }
 
+// Shown after the reader stops a download, and kept sticky for that file: a
+// re-render must not quietly start the transfer they just stopped.
+function showDriveStopped(book, fileId, meta, label, publicFile) {
+  const size = (meta && meta.size) || driveFileSize(book);
+  const name = (meta && meta.name) || label || book.title;
+  showDriveMessage(book, `drive-stopped-${fileId}`, "Download stopped",
+    `<em>${escapeHtml(name)}</em>${size ? ` is ${escapeHtml(formatBytes(size))} and` : ""} was not finished, so there is nothing to display yet.`,
+    `<button class="button primary" type="button" data-action="drive-load" data-file="${escapeHtml(fileId)}" data-public="${publicFile ? "1" : ""}">Download again${size ? ` (${escapeHtml(formatBytes(size))})` : ""}</button>` +
+    driveLinkButton(book, "Open in Drive instead"));
+}
+
 function loadDriveFile(book, fileId, page, meta, publicFile) {
   const request = ++driveRequestId;
   const current = selectedBook;
-  const total = (meta && meta.size) || 0;
+  const total = (meta && meta.size) || driveFileSize(book);
+
+  // Only one download runs at a time, so a newer one stops the old transfer
+  // instead of leaving both pulling bytes.
+  cancelDriveDownload();
+  const controller = new AbortController();
+  driveDownload = { fileId, controller, request };
+  driveCancelled.delete(fileId);
+
+  // Holding a very large file in memory is heavy on a small device, so the
+  // warning that used to block the download now rides along with it.
+  const caution = total > DRIVE_HEAVY_LIMIT
+    ? `<span class="drive-caution">A file this size needs a lot of memory. If the tab struggles, open it in Drive instead.</span>`
+    : "";
 
   showDriveMessage(book, `drive-loading-${fileId}`, "Opening…",
-    `<span id="driveProgress">Downloading ${escapeHtml(meta && meta.name ? meta.name : book.title)}${total ? ` (${escapeHtml(formatBytes(total))})` : ""}…</span>`);
+    `<span id="driveProgress">Downloading ${escapeHtml(meta && meta.name ? meta.name : book.title)}${total ? ` (${escapeHtml(formatBytes(total))})` : ""}…</span>` +
+    `<span class="drive-bar" aria-hidden="true"><span id="driveBar"></span></span>${caution}`,
+    `<button class="button secondary" type="button" data-action="drive-cancel">Cancel</button>` +
+    driveLinkButton(book, "Open in Drive instead"));
 
   const onProgress = (received, size) => {
     if (request !== driveRequestId) return;
     const label = document.querySelector("#driveProgress");
     if (!label) return;
     const cap = size || total;
+    const pct = cap ? Math.round((received / cap) * 100) : 0;
     label.textContent = cap
-      ? `Downloading… ${Math.round((received / cap) * 100)}% of ${formatBytes(cap)}`
+      ? `Downloading… ${pct}% of ${formatBytes(cap)}`
       : `Downloading… ${formatBytes(received)}`;
+    const bar = document.querySelector("#driveBar");
+    if (bar && cap) bar.style.width = `${pct}%`;
   };
 
-  window.OpenBooksDrive.fileBlobUrl(fileId, onProgress, publicFile).then((url) => {
+  window.OpenBooksDrive.fileBlobUrl(fileId, onProgress, publicFile, controller.signal).then((url) => {
     if (request !== driveRequestId || selectedBook !== current) {
       URL.revokeObjectURL(url); // a newer selection won this race
       return;
     }
+    driveDownload = null;
     releaseDriveFile();
     activeDriveFile = { fileId, url };
     showBlobPdf(book, url, page);
   }).catch((error) => {
     if (request !== driveRequestId || selectedBook !== current) return;
+    driveDownload = null;
+    // A cancel is the reader's own doing, not a failure to report as one.
+    if (error && error.name === "AbortError") {
+      showDriveStopped(book, fileId, meta, book.title, publicFile);
+      return;
+    }
     showDriveError(book, error);
   });
+}
+
+// The transfer in flight, so it can be stopped when the reader cancels or
+// moves to another book.
+let driveDownload = null;
+// Files whose download the reader stopped; they are not restarted on their own.
+const driveCancelled = new Set();
+
+function cancelDriveDownload() {
+  if (!driveDownload) return null;
+  const { fileId, controller } = driveDownload;
+  driveDownload = null;
+  controller.abort();
+  return fileId;
 }
 
 // One blob at a time: these books run to hundreds of megabytes, so the
@@ -1426,8 +1474,17 @@ function handleViewerAction(action, trigger) {
     renderReaderView();
     return;
   }
+  if (action === "drive-cancel") {
+    const stopped = cancelDriveDownload();
+    // Remembered so the re-render that follows does not start it again; the
+    // reader asked for it to stop, and a fresh click is what undoes that.
+    if (stopped) driveCancelled.add(stopped);
+    return;
+  }
   if (action === "drive-load" && selectedBook) {
-    loadDriveFile(selectedBook, trigger.dataset.file, currentChapterPage(), null,
+    const fileId = trigger.dataset.file;
+    driveCancelled.delete(fileId);
+    loadDriveFile(selectedBook, fileId, currentChapterPage(), null,
       trigger.dataset.public === "1");
   }
 }

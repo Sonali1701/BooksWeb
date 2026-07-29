@@ -319,14 +319,17 @@
   // The endpoint does honour Range requests (206), so a future viewer could
   // page through a large file instead of holding it whole — the browser's own
   // PDF viewer cannot, since it will not read from a blob progressively.
-  async function fileBlobUrl(fileId, onProgress, publicFile) {
+  // `signal` lets the reader stop a download that is already running. Without
+  // it a cancelled transfer would keep pulling hundreds of megabytes in the
+  // background, which is the cost the reader was trying to avoid.
+  async function fileBlobUrl(fileId, onProgress, publicFile, signal) {
     const auth = await credentials(publicFile);
     const url = driveUrl(
       `files/${encodeURIComponent(fileId)}`,
       { alt: "media", supportsAllDrives: "true" },
       auth.params
     );
-    const response = await fetch(url, { headers: auth.headers });
+    const response = await fetch(url, { headers: auth.headers, signal });
     if (!response.ok) throw accessError(response.status);
 
     const total = Number(response.headers.get("content-length") || 0);
