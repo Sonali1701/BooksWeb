@@ -1,0 +1,33 @@
+/* Open Books Library overrides for the bundled PDF.js viewer.
+   Kept in its own file so upgrading pdf.js means replacing the vendor files
+   and re-adding two lines to viewer.html, not re-deriving these rules. */
+
+/* The annotation tools cannot save anywhere from here -- there is no document
+   store behind this viewer -- so a student who highlights a chapter would lose
+   the lot on the next tap. Hidden rather than left to be found out the hard
+   way. "Open file" is likewise meaningless: the library chooses the file. */
+#editorModeButtons,
+#editorModeSeparator,
+#openFile,
+#secondaryOpenFile {
+  display: none !important;
+}
+
+/* The page already carries a top bar and chapter controls, so the viewer's own
+   toolbar is the third row competing for a phone screen. Tightened so more of
+   the actual page is visible. */
+@media (max-width: 900px) {
+  :root {
+    --toolbar-height: 36px;
+  }
+
+  #toolbarViewer {
+    height: 36px;
+  }
+
+  /* Page-width is already the default we ask for, so the zoom controls matter
+     less than knowing where you are in the chapter. */
+  #numPages {
+    display: none;
+  }
+}

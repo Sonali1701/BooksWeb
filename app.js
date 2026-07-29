@@ -600,10 +600,44 @@ function renderFrame(key, html) {
   pdfFrame.innerHTML = html;
 }
 
+// Whether pointing an iframe at a PDF actually shows the pages.
+//
+// It does on desktop, and there the browser's own viewer is faster and more
+// familiar than anything we could ship. On Android Chrome it does not: the
+// frame is replaced by a placeholder offering to hand the file to another app,
+// which is the "open" button people have to press before they can read
+// anything. iOS Safari draws only the first page and will not scroll to the
+// rest. Both need the pages drawn by us instead.
+const NATIVE_PDF_IN_FRAME = (() => {
+  const ua = navigator.userAgent || "";
+  if (/Android/i.test(ua)) return false;
+  if (/iPhone|iPad|iPod/i.test(ua)) return false;
+  // iPadOS reports itself as a Mac, so the touch points are the reliable tell.
+  if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return false;
+  // Browsers with PDF viewing switched off say so directly.
+  return navigator.pdfViewerEnabled !== false;
+})();
+
+const PDFJS_VIEWER = "vendor/pdfjs/web/viewer.html";
+
+// PDF.js resolves ?file= against its own location, so a path that is correct
+// for the page is wrong for the viewer unless it is made absolute first.
+//
+// #page= means the same thing to both viewers. #view=FitH does not: it is a
+// PDF open parameter the native viewers honour and PDF.js ignores, so it is
+// swapped for the PDF.js spelling. Fitting the width is what makes a textbook
+// legible on a phone without pinching, so it is worth carrying across.
+function frameSrc(url, hash) {
+  if (NATIVE_PDF_IN_FRAME) return encodeURI(url) + hash;
+  const absolute = new URL(url, location.href).href;
+  const viewerHash = hash === "#view=FitH" ? "#zoom=page-width" : hash;
+  return `${PDFJS_VIEWER}?file=${encodeURIComponent(absolute)}${viewerHash}`;
+}
+
 function showPdf(pdfPath, page) {
   const resolvedPath = resolvePdfUrl(pdfPath);
   const hash = page ? `#page=${page}` : "#view=FitH";
-  const src = encodeURI(resolvedPath) + hash;
+  const src = frameSrc(resolvedPath, hash);
   const key = `pdf:${resolvedPath}`;
   const iframe = pdfFrame.querySelector("iframe.pdf-embed");
 
@@ -1036,7 +1070,7 @@ function releaseDriveFile() {
 }
 
 function showBlobPdf(book, url, page) {
-  const src = page ? `${url}#page=${page}` : `${url}#view=FitH`;
+  const src = frameSrc(url, page ? `#page=${page}` : "#view=FitH");
   const key = `blob:${url}`;
   const iframe = pdfFrame.querySelector("iframe.pdf-embed");
   const account = driveAccountLabel();
