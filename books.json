@@ -86,6 +86,307 @@
     ]
   },
   {
+    "id": "campbell-biology-10e",
+    "title": "Campbell Biology (Tenth Edition)",
+    "subject": "Biology",
+    "class": "11 & 12",
+    "wing": "NEET",
+    "language": "English",
+    "year": "",
+    "author": "Reece, Urry, Cain, Wasserman, Minorsky, Jackson",
+    "publication": "Pearson",
+    "description": "Comprehensive reference biology text, split into one PDF per chapter so a chapter opens without loading the whole book.",
+    "sourceUrl": "",
+    "pdf": "",
+    "chapters": [
+      {
+        "title": "Chapter 1: Evolution, the Themes of Biology, and Scientific Inquiry",
+        "unit": "",
+        "pdf": "pdfs/campbell-biology-10e/ch01.pdf"
+      },
+      {
+        "title": "Chapter 2: The Chemical Context of Life",
+        "unit": "UNIT 1 THE CHEMISTRY OF LIFE",
+        "pdf": "pdfs/campbell-biology-10e/ch02.pdf"
+      },
+      {
+        "title": "Chapter 3: Water and Life",
+        "unit": "UNIT 1 THE CHEMISTRY OF LIFE",
+        "pdf": "pdfs/campbell-biology-10e/ch03.pdf"
+      },
+      {
+        "title": "Chapter 4: Carbon and the Molecular Diversity of Life",
+        "unit": "UNIT 1 THE CHEMISTRY OF LIFE",
+        "pdf": "pdfs/campbell-biology-10e/ch04.pdf"
+      },
+      {
+        "title": "Chapter 5: The Structure and Function of Large Biological Molecules",
+        "unit": "UNIT 1 THE CHEMISTRY OF LIFE",
+        "pdf": "pdfs/campbell-biology-10e/ch05.pdf"
+      },
+      {
+        "title": "Chapter 6: A Tour of the Cell",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch06.pdf"
+      },
+      {
+        "title": "Chapter 7: Membrane Structure and Function",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch07.pdf"
+      },
+      {
+        "title": "Chapter 8: An Introduction to Metabolism",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch08.pdf"
+      },
+      {
+        "title": "Chapter 9: Cellular Respiration and Fermentation",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch09.pdf"
+      },
+      {
+        "title": "Chapter 10: Photosynthesis",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch10.pdf"
+      },
+      {
+        "title": "Chapter 11: Cell Communication",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch11.pdf"
+      },
+      {
+        "title": "Chapter 12: The Cell Cycle",
+        "unit": "UNIT 2 THE CELL",
+        "pdf": "pdfs/campbell-biology-10e/ch12.pdf"
+      },
+      {
+        "title": "Chapter 13: Meiosis and Sexual Life Cycles",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch13.pdf"
+      },
+      {
+        "title": "Chapter 14: Mendel and the Gene Idea",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch14.pdf"
+      },
+      {
+        "title": "Chapter 15: The Chromosomal Basis of Inheritance",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch15.pdf"
+      },
+      {
+        "title": "Chapter 16: The Molecular Basis of Inheritance",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch16.pdf"
+      },
+      {
+        "title": "Chapter 17: Gene Expression: From Gene to Protein",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch17.pdf"
+      },
+      {
+        "title": "Chapter 18: Regulation of Gene Expression",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch18.pdf"
+      },
+      {
+        "title": "Chapter 19: Viruses",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch19.pdf"
+      },
+      {
+        "title": "Chapter 20: DNA Tools and Biotechnology",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch20.pdf"
+      },
+      {
+        "title": "Chapter 21: Genomes and Their Evolution",
+        "unit": "UNIT 3 GENETICS",
+        "pdf": "pdfs/campbell-biology-10e/ch21.pdf"
+      },
+      {
+        "title": "Chapter 22: Descent with Modification: A Darwinian View of Life",
+        "unit": "UNIT 4 MECHANISMS OF EVOLUTION",
+        "pdf": "pdfs/campbell-biology-10e/ch22.pdf"
+      },
+      {
+        "title": "Chapter 23: The Evolution of Populations",
+        "unit": "UNIT 4 MECHANISMS OF EVOLUTION",
+        "pdf": "pdfs/campbell-biology-10e/ch23.pdf"
+      },
+      {
+        "title": "Chapter 24: The Origin of Species",
+        "unit": "UNIT 4 MECHANISMS OF EVOLUTION",
+        "pdf": "pdfs/campbell-biology-10e/ch24.pdf"
+      },
+      {
+        "title": "Chapter 25: The History of Life on Earth",
+        "unit": "UNIT 4 MECHANISMS OF EVOLUTION",
+        "pdf": "pdfs/campbell-biology-10e/ch25.pdf"
+      },
+      {
+        "title": "Chapter 26: Phylogeny and the Tree of Life",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch26.pdf"
+      },
+      {
+        "title": "Chapter 27: Bacteria and Archaea",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch27.pdf"
+      },
+      {
+        "title": "Chapter 28: Protists",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch28.pdf"
+      },
+      {
+        "title": "Chapter 29: Plant Diversity I: How Plants Colonized Land",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch29.pdf"
+      },
+      {
+        "title": "Chapter 30: Plant Diversity II: The Evolution of Seed Plants",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch30.pdf"
+      },
+      {
+        "title": "Chapter 31: Fungi",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch31.pdf"
+      },
+      {
+        "title": "Chapter 32: An Overview of Animal Diversity",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch32.pdf"
+      },
+      {
+        "title": "Chapter 33: An Introduction to Invertebrates",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch33.pdf"
+      },
+      {
+        "title": "Chapter 34: The Origin and Evolution of Vertebrates",
+        "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY",
+        "pdf": "pdfs/campbell-biology-10e/ch34.pdf"
+      },
+      {
+        "title": "Chapter 35: Plant Structure, Growth, and Development",
+        "unit": "UNIT 6 PLANT FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch35.pdf"
+      },
+      {
+        "title": "Chapter 36: Resource Acquisition and Transport in Vascular Plants",
+        "unit": "UNIT 6 PLANT FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch36.pdf"
+      },
+      {
+        "title": "Chapter 37: Soil and Plant Nutrition",
+        "unit": "UNIT 6 PLANT FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch37.pdf"
+      },
+      {
+        "title": "Chapter 38: Angiosperm Reproduction and Biotechnology",
+        "unit": "UNIT 6 PLANT FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch38.pdf"
+      },
+      {
+        "title": "Chapter 39: Plant Responses to Internal and External Signals",
+        "unit": "UNIT 6 PLANT FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch39.pdf"
+      },
+      {
+        "title": "Chapter 40: Basic Principles of Animal Form and Function",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch40.pdf"
+      },
+      {
+        "title": "Chapter 41: Animal Nutrition",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch41.pdf"
+      },
+      {
+        "title": "Chapter 42: Circulation and Gas Exchange",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch42.pdf"
+      },
+      {
+        "title": "Chapter 43: The Immune System",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch43.pdf"
+      },
+      {
+        "title": "Chapter 44: Osmoregulation and Excretion",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch44.pdf"
+      },
+      {
+        "title": "Chapter 45: Hormones and the Endocrine System",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch45.pdf"
+      },
+      {
+        "title": "Chapter 46: Animal Reproduction",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch46.pdf"
+      },
+      {
+        "title": "Chapter 47: Animal Development",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch47.pdf"
+      },
+      {
+        "title": "Chapter 48: Neurons, Synapses, and Signaling",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch48.pdf"
+      },
+      {
+        "title": "Chapter 49: Nervous Systems",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch49.pdf"
+      },
+      {
+        "title": "Chapter 50: Sensory and Motor Mechanisms",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch50.pdf"
+      },
+      {
+        "title": "Chapter 51: Animal Behavior",
+        "unit": "UNIT 7 ANIMAL FORM AND FUNCTION",
+        "pdf": "pdfs/campbell-biology-10e/ch51.pdf"
+      },
+      {
+        "title": "Chapter 52: An Introduction to Ecology and the Biosphere",
+        "unit": "UNIT 8 ECOLOGY",
+        "pdf": "pdfs/campbell-biology-10e/ch52.pdf"
+      },
+      {
+        "title": "Chapter 53: Population Ecology",
+        "unit": "UNIT 8 ECOLOGY",
+        "pdf": "pdfs/campbell-biology-10e/ch53.pdf"
+      },
+      {
+        "title": "Chapter 54: Community Ecology",
+        "unit": "UNIT 8 ECOLOGY",
+        "pdf": "pdfs/campbell-biology-10e/ch54.pdf"
+      },
+      {
+        "title": "Chapter 55: Ecosystems and Restoration Ecology",
+        "unit": "UNIT 8 ECOLOGY",
+        "pdf": "pdfs/campbell-biology-10e/ch55.pdf"
+      },
+      {
+        "title": "Chapter 56: Conservation Biology and Global Change",
+        "unit": "UNIT 8 ECOLOGY",
+        "pdf": "pdfs/campbell-biology-10e/ch56.pdf"
+      },
+      {
+        "title": "Appendices, Glossary & Index",
+        "unit": "REFERENCE",
+        "pdf": "pdfs/campbell-biology-10e/reference.pdf"
+      }
+    ]
+  },
+  {
     "id": "es-1-botany-aakash",
     "title": "Aakash",
     "subject": "Botany",

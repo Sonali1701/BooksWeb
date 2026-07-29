@@ -9278,6 +9278,10 @@
       "filename": "Chemistry.pdf",
       "size": 53289204,
       "chapterError": "PDF has no embedded bookmarks"
+    },
+    "campbell-biology-10e": {
+      "kind": "hosted",
+      "access": "public"
     }
   }
 }

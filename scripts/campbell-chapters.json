@@ -1,0 +1,348 @@
+{
+  "_comment": [
+    "Chapter boundaries for Campbell Biology 10e (1484-page source).",
+    "Taken from the catalogue map, not the PDF outline: that outline omits",
+    "chapters 40 and 41 and numbers the final chapter 55 twice. Every boundary",
+    "below was confirmed by reading the running header on the pages either side."
+  ],
+  "pageCount": 1484,
+  "end": 1328,
+  "chapters": [
+    {
+      "num": 1,
+      "page": 49,
+      "title": "Chapter 1: Evolution, the Themes of Biology, and Scientific Inquiry",
+      "unit": ""
+    },
+    {
+      "num": 2,
+      "page": 77,
+      "title": "Chapter 2: The Chemical Context of Life",
+      "unit": "UNIT 1 THE CHEMISTRY OF LIFE"
+    },
+    {
+      "num": 3,
+      "page": 93,
+      "title": "Chapter 3: Water and Life",
+      "unit": "UNIT 1 THE CHEMISTRY OF LIFE"
+    },
+    {
+      "num": 4,
+      "page": 105,
+      "title": "Chapter 4: Carbon and the Molecular Diversity of Life",
+      "unit": "UNIT 1 THE CHEMISTRY OF LIFE"
+    },
+    {
+      "num": 5,
+      "page": 115,
+      "title": "Chapter 5: The Structure and Function of Large Biological Molecules",
+      "unit": "UNIT 1 THE CHEMISTRY OF LIFE"
+    },
+    {
+      "num": 6,
+      "page": 142,
+      "title": "Chapter 6: A Tour of the Cell",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 7,
+      "page": 173,
+      "title": "Chapter 7: Membrane Structure and Function",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 8,
+      "page": 190,
+      "title": "Chapter 8: An Introduction to Metabolism",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 9,
+      "page": 211,
+      "title": "Chapter 9: Cellular Respiration and Fermentation",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 10,
+      "page": 234,
+      "title": "Chapter 10: Photosynthesis",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 11,
+      "page": 259,
+      "title": "Chapter 11: Cell Communication",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 12,
+      "page": 281,
+      "title": "Chapter 12: The Cell Cycle",
+      "unit": "UNIT 2 THE CELL"
+    },
+    {
+      "num": 13,
+      "page": 301,
+      "title": "Chapter 13: Meiosis and Sexual Life Cycles",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 14,
+      "page": 316,
+      "title": "Chapter 14: Mendel and the Gene Idea",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 15,
+      "page": 341,
+      "title": "Chapter 15: The Chromosomal Basis of Inheritance",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 16,
+      "page": 361,
+      "title": "Chapter 16: The Molecular Basis of Inheritance",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 17,
+      "page": 382,
+      "title": "Chapter 17: Gene Expression: From Gene to Protein",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 18,
+      "page": 409,
+      "title": "Chapter 18: Regulation of Gene Expression",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 19,
+      "page": 441,
+      "title": "Chapter 19: Viruses",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 20,
+      "page": 457,
+      "title": "Chapter 20: DNA Tools and Biotechnology",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 21,
+      "page": 485,
+      "title": "Chapter 21: Genomes and Their Evolution",
+      "unit": "UNIT 3 GENETICS"
+    },
+    {
+      "num": 22,
+      "page": 511,
+      "title": "Chapter 22: Descent with Modification: A Darwinian View of Life",
+      "unit": "UNIT 4 MECHANISMS OF EVOLUTION"
+    },
+    {
+      "num": 23,
+      "page": 529,
+      "title": "Chapter 23: The Evolution of Populations",
+      "unit": "UNIT 4 MECHANISMS OF EVOLUTION"
+    },
+    {
+      "num": 24,
+      "page": 549,
+      "title": "Chapter 24: The Origin of Species",
+      "unit": "UNIT 4 MECHANISMS OF EVOLUTION"
+    },
+    {
+      "num": 25,
+      "page": 568,
+      "title": "Chapter 25: The History of Life on Earth",
+      "unit": "UNIT 4 MECHANISMS OF EVOLUTION"
+    },
+    {
+      "num": 26,
+      "page": 596,
+      "title": "Chapter 26: Phylogeny and the Tree of Life",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 27,
+      "page": 616,
+      "title": "Chapter 27: Bacteria and Archaea",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 28,
+      "page": 636,
+      "title": "Chapter 28: Protists",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 29,
+      "page": 661,
+      "title": "Chapter 29: Plant Diversity I: How Plants Colonized Land",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 30,
+      "page": 679,
+      "title": "Chapter 30: Plant Diversity II: The Evolution of Seed Plants",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 31,
+      "page": 697,
+      "title": "Chapter 31: Fungi",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 32,
+      "page": 716,
+      "title": "Chapter 32: An Overview of Animal Diversity",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 33,
+      "page": 729,
+      "title": "Chapter 33: An Introduction to Invertebrates",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 34,
+      "page": 761,
+      "title": "Chapter 34: The Origin and Evolution of Vertebrates",
+      "unit": "UNIT 5 THE EVOLUTIONARY HISTORY OF BIOLOGICAL DIVERSITY"
+    },
+    {
+      "num": 35,
+      "page": 801,
+      "title": "Chapter 35: Plant Structure, Growth, and Development",
+      "unit": "UNIT 6 PLANT FORM AND FUNCTION"
+    },
+    {
+      "num": 36,
+      "page": 827,
+      "title": "Chapter 36: Resource Acquisition and Transport in Vascular Plants",
+      "unit": "UNIT 6 PLANT FORM AND FUNCTION"
+    },
+    {
+      "num": 37,
+      "page": 848,
+      "title": "Chapter 37: Soil and Plant Nutrition",
+      "unit": "UNIT 6 PLANT FORM AND FUNCTION"
+    },
+    {
+      "num": 38,
+      "page": 864,
+      "title": "Chapter 38: Angiosperm Reproduction and Biotechnology",
+      "unit": "UNIT 6 PLANT FORM AND FUNCTION"
+    },
+    {
+      "num": 39,
+      "page": 885,
+      "title": "Chapter 39: Plant Responses to Internal and External Signals",
+      "unit": "UNIT 6 PLANT FORM AND FUNCTION"
+    },
+    {
+      "num": 40,
+      "page": 916,
+      "title": "Chapter 40: Basic Principles of Animal Form and Function",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 41,
+      "page": 941,
+      "title": "Chapter 41: Animal Nutrition",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 42,
+      "page": 964,
+      "title": "Chapter 42: Circulation and Gas Exchange",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 43,
+      "page": 995,
+      "title": "Chapter 43: The Immune System",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 44,
+      "page": 1020,
+      "title": "Chapter 44: Osmoregulation and Excretion",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 45,
+      "page": 1042,
+      "title": "Chapter 45: Hormones and the Endocrine System",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 46,
+      "page": 1062,
+      "title": "Chapter 46: Animal Reproduction",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 47,
+      "page": 1086,
+      "title": "Chapter 47: Animal Development",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 48,
+      "page": 1110,
+      "title": "Chapter 48: Neurons, Synapses, and Signaling",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 49,
+      "page": 1128,
+      "title": "Chapter 49: Nervous Systems",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 50,
+      "page": 1150,
+      "title": "Chapter 50: Sensory and Motor Mechanisms",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 51,
+      "page": 1182,
+      "title": "Chapter 51: Animal Behavior",
+      "unit": "UNIT 7 ANIMAL FORM AND FUNCTION"
+    },
+    {
+      "num": 52,
+      "page": 1207,
+      "title": "Chapter 52: An Introduction to Ecology and the Biosphere",
+      "unit": "UNIT 8 ECOLOGY"
+    },
+    {
+      "num": 53,
+      "page": 1233,
+      "title": "Chapter 53: Population Ecology",
+      "unit": "UNIT 8 ECOLOGY"
+    },
+    {
+      "num": 54,
+      "page": 1257,
+      "title": "Chapter 54: Community Ecology",
+      "unit": "UNIT 8 ECOLOGY"
+    },
+    {
+      "num": 55,
+      "page": 1281,
+      "title": "Chapter 55: Ecosystems and Restoration Ecology",
+      "unit": "UNIT 8 ECOLOGY"
+    },
+    {
+      "num": 56,
+      "page": 1303,
+      "title": "Chapter 56: Conservation Biology and Global Change",
+      "unit": "UNIT 8 ECOLOGY"
+    }
+  ]
+}
